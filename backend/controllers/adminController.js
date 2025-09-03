@@ -221,7 +221,13 @@ const adminDashboard = async (req, res) => {
       activeDoctors: doctors.filter((item) => item.available).length,
       inactiveDoctors: doctors.filter((item) => !item.available).length,
       appointments: appointments.length,
+      completedAppointment: appointments.filter((item) => item.isCompleted)
+        .length,
+      cancelAppointment: appointments.filter((item) => item.cancelled).length,
       patients: users.length,
+      pendingAppointment: appointments.filter(
+        (item) => !item.isCompleted && !item.cancelled
+      ).length,
       latestAppointments: appointments.reverse().slice(0, 5),
     };
     res.json({
