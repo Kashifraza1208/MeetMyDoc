@@ -1,37 +1,51 @@
 import React, { useContext, useEffect } from "react";
 import { assets } from "../../assets/assets";
-import { AdminContext } from "../../context/AdminContext";
+import { RiMoneyRupeeCircleFill } from "react-icons/ri";
 import { AppContext } from "../../context/AppContext";
-import { FaCalendarAlt } from "react-icons/fa";
-import { FaUsers } from "react-icons/fa";
-import { FaStethoscope } from "react-icons/fa";
-import AppointmentStatus from "./AppointmentStatus";
+import {
+  FaStethoscope,
+  FaUserInjured,
+  FaCalendarAlt,
+  FaCheckCircle,
+  FaTimesCircle,
+} from "react-icons/fa";
 
-const Dashboard = () => {
-  const { aToken, getDashboardData, dashData, cancelAppointment } =
-    useContext(AdminContext);
+import AppointmentStatus from "../admin/AppointmentStatus";
+import { DoctorContext } from "../../context/DoctorContext";
+
+const DoctorDashboard = () => {
+  const {
+    dToken,
+    dashData,
+    getDashData,
+    completeAppointment,
+    cancelAppointment,
+  } = useContext(DoctorContext);
+
   const { slotDateFormat } = useContext(AppContext);
 
   useEffect(() => {
-    if (aToken) {
-      getDashboardData();
+    if (dToken) {
+      getDashData();
     }
-  }, [aToken]);
+  }, [dToken]);
+
+  console.log(dashData, "data");
 
   const statsCards = [
     {
-      icon: <FaStethoscope className="w-6 h-6 text-green-600" />,
-      count: dashData.activeDoctors,
-      label: "Active Doctors",
-      bgColor: "bg-green-100",
-      iconBg: "bg-green-200",
+      icon: <RiMoneyRupeeCircleFill className="w-6 h-6 text-yellow-600" />,
+      count: "₹ " + dashData.earnings,
+      label: "Total Earnings",
+      bgColor: "bg-yellow-100",
+      iconBg: "bg-yellow-200",
     },
     {
-      icon: <FaStethoscope className="w-6 h-6 text-red-600" />,
-      count: dashData.inactiveDoctors,
-      label: "Inactive Doctors",
-      bgColor: "bg-red-100",
-      iconBg: "bg-red-200",
+      icon: <FaUserInjured className="w-6 h-6 text-purple-600" />,
+      count: dashData.patients,
+      label: "Total Patients",
+      bgColor: "bg-purple-100",
+      iconBg: "bg-purple-200",
     },
     {
       icon: <FaCalendarAlt className="w-6 h-6 text-blue-600" />,
@@ -40,27 +54,23 @@ const Dashboard = () => {
       bgColor: "bg-blue-100",
       iconBg: "bg-blue-200",
     },
-    {
-      icon: <FaUsers className="w-6 h-6 text-indigo-600" />,
-      count: dashData.patients,
-      label: "Registered Patients",
-      bgColor: "bg-indigo-100",
-      iconBg: "bg-indigo-200",
-    },
   ];
+
   return (
     dashData && (
       <div className=" w-full  md:ml-52 md:left-52 top-14 md:w-[calc(100%-208px)]">
         <div className="md:px-14 p-5">
           <div className="mb-8">
-            <h1 className="text-xl font-bold text-gray-800">Admin Dashboard</h1>
+            <h1 className="text-xl font-bold text-gray-800">
+              Doctor Dashboard
+            </h1>
             <p className="text-gray-500 mt-1">
-              Overview of doctors, patients, and recent appointments.
+              Overview of earnings, patients, and recent appointments.
             </p>
           </div>
 
           {/* Top Stats */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {statsCards.map((stat, index) => (
               <div
                 key={index}
@@ -135,12 +145,20 @@ const Dashboard = () => {
                       Completed
                     </span>
                   ) : (
-                    <img
-                      className="w-8 h-8 cursor-pointer hover:scale-110 transition"
-                      src={assets.cancel_icon}
-                      alt="Cancel"
-                      onClick={() => cancelAppointment(appointment._id)}
-                    />
+                    <div className="flex">
+                      <img
+                        className="w-10 cursor-pointer"
+                        src={assets.cancel_icon}
+                        alt="Cancel"
+                        onClick={() => cancelAppointment(appointment._id)}
+                      />
+                      <img
+                        className="w-10 cursor-pointer"
+                        src={assets.tick_icon}
+                        alt="Accept"
+                        onClick={() => completeAppointment(appointment._id)}
+                      />
+                    </div>
                   )}
                 </div>
               ))}
@@ -152,4 +170,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default DoctorDashboard;

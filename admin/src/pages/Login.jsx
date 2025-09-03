@@ -5,6 +5,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { useState } from "react";
 import { AdminContext } from "../context/AdminContext";
+import { DoctorContext } from "../context/DoctorContext";
 
 const Login = () => {
   const [state, setState] = useState("Admin");
@@ -12,6 +13,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
 
   const { setAToken, backendUrl } = useContext(AdminContext);
+  const { setDToken } = useContext(DoctorContext);
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
@@ -31,6 +33,17 @@ const Login = () => {
         } else {
           toast.error(data.message);
         }
+      } else {
+        const { data } = await axios.post(`${backendUrl}/api/doctor/login`, {
+          email,
+          password,
+        });
+        if (data.success) {
+          localStorage.setItem("dToken", data.token);
+          setDToken(data.token);
+        } else {
+          toast.error(data.message);
+        }
       }
     } catch (error) {
       console.log(error);
@@ -38,7 +51,7 @@ const Login = () => {
   };
 
   return (
-    <form className="min-h-[80vh] flex items-center" onSubmit={onSubmitHandler}>
+    <form className="h-screen flex items-center" onSubmit={onSubmitHandler}>
       <div
         className="flex flex-col gap-3 m-auto items-start p-8 min-w-[340px] 
       sm:min-w-96 border rounded-xl border-gray-200 text-zinc-600 text-sm shadow-lg"
