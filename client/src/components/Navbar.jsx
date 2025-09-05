@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import { assets } from "../assets/assets";
 import { NavLink, useNavigate } from "react-router-dom";
-import { CiStethoscope } from "react-icons/ci";
+
 import { AppContext } from "../context/AppContext";
 
 const Navbar = () => {
@@ -21,7 +21,8 @@ const Navbar = () => {
         className="flex items-center cursor-pointer gap-2"
         onClick={() => navigate("/")}
       >
-        <CiStethoscope className="h-8 w-8 text-[var(--parimary)] font-bold" />
+        <img src={assets.logo} alt="" className="h-8 w-8 object-contain" />
+
         <span className="text-2xl font-bold text-[var(--parimary)]">
           MeetMyDoc
         </span>
@@ -98,7 +99,11 @@ const Navbar = () => {
               className="flex items-center cursor-pointer gap-2"
               onClick={() => navigate("/")}
             >
-              <CiStethoscope className="h-8 w-8 text-[var(--parimary)] font-bold" />
+              <img
+                src={assets.logo}
+                alt=""
+                className="h-8 w-8 object-contain"
+              />
               <span className="text-2xl font-bold text-[var(--parimary)]">
                 MeetMyDoc
               </span>

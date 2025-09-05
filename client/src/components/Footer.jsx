@@ -1,4 +1,4 @@
-import { CiStethoscope } from "react-icons/ci";
+import { assets } from "../assets/assets";
 
 const Footer = () => {
   return (
@@ -9,7 +9,11 @@ const Footer = () => {
             {/* Left Section */}
             <div>
               <div className="flex items-center gap-2 mb-3">
-                <CiStethoscope className="h-8 w-8 text-[var(--parimary)] font-bold" />
+                <img
+                  src={assets.logo}
+                  alt=""
+                  className="h-8 w-8 object-contain"
+                />
                 <span className="text-2xl font-bold text-[var(--parimary)]">
                   MeetMyDoc
                 </span>

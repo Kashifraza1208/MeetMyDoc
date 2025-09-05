@@ -7,7 +7,7 @@ const WhyChooseUs = () => {
         {/* Heading */}
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
-            Why Choose MeetMyDoc?
+            Why Choose <span className="text-blue-600"> MeetMyDoc</span>?
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             We provide comprehensive healthcare solutions with cutting-edge
