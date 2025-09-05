@@ -19,7 +19,13 @@ connectCloudinary();
 //middlewares
 
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: ["https://meetmydoc.vercel.app"],
+
+    credentials: true,
+  })
+);
 
 //api endpoint
 app.get("/", (req, res) => {
