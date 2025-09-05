@@ -8,7 +8,7 @@ const TopDoctors = () => {
   return (
     <div className="flex flex-col py-20 items-center gap-4 text-gray-900 md:mx-10">
       <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-1">
-        Top Doctors to Book
+        <span className="text-blue-600"> Top Doctors </span> to Book
       </h2>
       <p className="text-lg text-gray-600 max-w-2xl mx-auto">
         Simply browse through our extensive list of trusted doctors.

@@ -30,7 +30,7 @@ const DoctorsList = () => {
   return (
     <div className=" w-full max-h-[90vh] overflow-y-scroll  md:ml-52 md:left-52 md:w-[calc(100%-208px)]">
       <div className="w-full md:px-14 p-5">
-        <div className="flex items-center justify-between mb-3">
+        <div className="md:flex-row flex-col flex items-center justify-between mb-3">
           <h1 className="text-lg md:text-xl font-bold">All Doctors</h1>
           <div className="relative w-full md:w-72">
             <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />

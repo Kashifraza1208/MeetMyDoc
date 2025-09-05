@@ -1,75 +1,64 @@
 import React from "react";
 import { assets } from "../assets/assets";
+import WhyChooseUs from "../components/WhyChooseUs";
 
 const About = () => {
   return (
-    <div>
-      <div className="text-center text-2xl pt-10 text-gray-500">
-        <p>
-          ABOUT <span className="text-gray-700 font-medium">US</span>
+    <section className="py-16 px-6 md:px-12 bg-white">
+      {/* About Heading */}
+      <div className="text-center mb-12">
+        <h2 className="text-3xl font-bold text-gray-800">
+          About <span className="text-blue-600">Us</span>
+        </h2>
+        <p className="mt-3 text-gray-600 max-w-2xl mx-auto text-sm md:text-base">
+          MeetMyDoc is your trusted partner in managing healthcare needs,
+          bridging the gap between patients and doctors with a seamless,
+          technology-driven experience.
         </p>
       </div>
 
-      <div className="my-10 flex flex-col md:flex-row gap-12">
+      {/* About Content */}
+      <div className="flex flex-col md:flex-row items-center gap-12 mb-16">
+        {/* Image */}
         <img
           src={assets.about_image}
-          alt=""
-          className="w-full md:max-w-[360px]"
+          alt="About MeetMyDoc"
+          className="w-full md:max-w-[380px] rounded-xl shadow-lg"
         />
-        <div className="flex flex-col justify-center gap-6 md:w-1/2 text-sm text-gray-600">
+
+        {/* Text */}
+        <div className="flex flex-col gap-6 text-gray-600 text-sm md:text-base leading-relaxed md:w-1/2">
           <p>
-            Welcome to MeetMyDoc, your trusted partner in managing your
-            healthcare needs conveniently and efficiently. At MeetMyDoc, we
-            understand the challenges individuals face when it comes to
-            scheduling doctor appointments and managing their health records.
+            Welcome to{" "}
+            <span className="font-semibold text-gray-800">MeetMyDoc</span>, your
+            reliable healthcare companion. We understand the challenges of
+            booking appointments and managing health records, so we built a
+            platform that simplifies these processes for patients, doctors, and
+            admins alike.
           </p>
           <p>
-            MeetMyDoc is committed to excellence in healthcare technology. We
-            continuously strive to enhance our platform, integrating the latest
-            advancements to improve user experience and deliver superior
-            service. Whether you're booking your first appointment or managing
-            ongoing care, MeetMyDoc is here to support you every step of the
-            way.
+            Our platform is designed with efficiency and care in mind, ensuring
+            smooth scheduling, secure data handling, and easy access to trusted
+            medical professionals. From your first consultation to ongoing care,
+            MeetMyDoc supports you at every step.
           </p>
-          <b className="text-gray-800">Our Vision</b>
-          <p>
-            Our vision at MeetMyDoc is to create a seamless healthcare
-            experience for every user. We aim to bridge the gap between patients
-            and healthcare providers, making it easier for you to access the
-            care you need, when you need it.
-          </p>
+
+          <div>
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">
+              Our Vision
+            </h3>
+            <p>
+              To create a healthcare ecosystem where every patient has quick,
+              reliable, and affordable access to doctors. We aim to remove
+              barriers in healthcare access by leveraging modern technology and
+              innovation.
+            </p>
+          </div>
         </div>
       </div>
 
-      <div className="text-xl my-4">
-        <p>
-          WHY <span className="text-gray-700 font-semibold">CHOOSE US</span>
-        </p>
-      </div>
-      <div className="flex flex-col md:flex-row mb-20">
-        <div className="border border-gray-200 px-10 md:px-16 py-8 sm:py-16 flex flex-col gap-5 text-[15px] hover:bg-[var(--primary)] hover:text-white transition-all duration-300 cursor-pointer">
-          <b>EFFICIENCY:</b>
-          <p>
-            Streamlined appointment scheduling that fits into your busy
-            lifestyle.
-          </p>
-        </div>
-        <div className="border border-gray-200 px-10 md:px-16 py-8 sm:py-16 flex flex-col gap-5 text-[15px] hover:bg-[var(--primary)] hover:text-white transition-all duration-300 cursor-pointer">
-          <b>CONVENIENCE:</b>
-          <p>
-            Access to a network of trusted healthcare professionals in your
-            area.
-          </p>
-        </div>
-        <div className="border border-gray-200 px-10 md:px-16 py-8 sm:py-16 flex flex-col gap-5 text-[15px] hover:bg-[var(--primary)] hover:text-white transition-all duration-300 cursor-pointer">
-          <b>PERSONALIZATION:</b>
-          <p>
-            Tailored recommendations and reminders to help you stay on top of
-            your health.
-          </p>
-        </div>
-      </div>
-    </div>
+      <WhyChooseUs />
+    </section>
   );
 };
 

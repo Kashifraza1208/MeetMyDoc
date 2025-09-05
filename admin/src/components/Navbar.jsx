@@ -5,6 +5,7 @@ import { CiStethoscope } from "react-icons/ci";
 import { useContext } from "react";
 import { AdminContext } from "../context/AdminContext";
 import { DoctorContext } from "../context/DoctorContext";
+import { assets } from "../assets/assets";
 
 const Navbar = () => {
   const { aToken, setAToken } = useContext(AdminContext);
@@ -28,7 +29,7 @@ const Navbar = () => {
           className="flex items-center justify-center cursor-pointer gap-2"
           onClick={() => navigate("/")}
         >
-          <CiStethoscope className="md:h-10 md:w-10 h-7 w-7 text-[var(--parimary)] font-bold" />
+          <img src={assets.logo} alt="" className="h-8 w-8 object-contain" />
           <div className="flex flex-col mb-0">
             <span className="md:text-xl text-lg font-bold text-[var(--parimary)]">
               MeetMyDoc

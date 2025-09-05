@@ -35,7 +35,7 @@ const AllAppointments = () => {
   return (
     <div className=" w-full  md:ml-52 md:left-52 md:w-[calc(100%-208px)]">
       <div className="w-full md:px-14 p-5">
-        <div className="flex items-center justify-between mb-3">
+        <div className="md:flex-row flex-col flex items-center justify-between mb-3">
           <p className="md:text-xl text-lg font-bold">All Appointments</p>
           <div className="relative w-full md:w-72">
             <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />

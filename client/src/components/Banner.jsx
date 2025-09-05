@@ -10,7 +10,8 @@ const Banner = () => {
       <section className="pt-20">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
-            Ready to Take Care of Your Health?
+            Ready to Take Care of Your{" "}
+            <span className="text-blue-600"> Health </span>?
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Join thousands of satisfied patients who trust MeetMyDoc for their

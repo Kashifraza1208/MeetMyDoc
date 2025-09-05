@@ -30,8 +30,6 @@ const DoctorDashboard = () => {
     }
   }, [dToken]);
 
-  console.log(dashData, "data");
-
   const statsCards = [
     {
       icon: <RiMoneyRupeeCircleFill className="w-6 h-6 text-yellow-600" />,
