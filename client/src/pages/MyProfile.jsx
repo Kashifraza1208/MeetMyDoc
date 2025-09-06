@@ -1,16 +1,20 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { assets } from "../assets/assets";
 import { AppContext } from "../context/AppContext";
 import axios from "axios";
 import Loading from "../components/Loading";
 
 import { toast } from "react-toastify";
+import axiosInstance from "../apis/axiosInstance";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const MyProfile = () => {
   const [isEdit, setIsEdit] = useState(false);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const { userData, setUserData, token, backendUrl, loadUserProfileData } =
+  const { userData, setUserData, isAuthenticated, loadUserProfileData } =
     useContext(AppContext);
   const [image, setImage] = useState(false);
 
@@ -24,14 +28,10 @@ const MyProfile = () => {
       formData.append("gender", userData.gender);
       formData.append("dob", userData.dob);
       image && formData.append("image", image);
-      const { data } = await axios.post(
-        `${backendUrl}/api/user/update-profile`,
+      const { data } = await axiosInstance.post(
+        `/api/user/update-profile`,
         formData,
-        {
-          headers: {
-            token,
-          },
-        }
+        { withCredentials: true }
       );
       if (data.success) {
         toast.success(data.message);

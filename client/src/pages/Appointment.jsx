@@ -7,11 +7,12 @@ import Loading from "../components/Loading";
 
 import { toast } from "react-toastify";
 import axios from "axios";
+import axiosInstance from "../apis/axiosInstance";
 
 const Appointment = () => {
   const { docId } = useParams();
 
-  const { doctors, currencySymbol, token, backendUrl, getAllDoctors } =
+  const { doctors, isAuthenticated, currencySymbol, getAllDoctors } =
     useContext(AppContext);
   const daysOfWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
   const navigate = useNavigate();
@@ -90,10 +91,11 @@ const Appointment = () => {
   };
 
   const bookAppointment = async () => {
-    if (!token) {
+    if (!isAuthenticated) {
       toast.warn("Login to book appointment");
       return navigate("/login");
     }
+
     try {
       setLoading(true);
       const date = docSlots[slotIndex][0].dateTime;
@@ -103,13 +105,14 @@ const Appointment = () => {
 
       const slotDate = day + "_" + month + "_" + year;
 
-      const { data } = await axios.post(
-        `${backendUrl}/api/user/book-appointment`,
+      const { data } = await axiosInstance.post(
+        `/api/user/book-appointment`,
         { docId, slotDate, slotTime },
         {
           headers: {
-            token,
+            "Content-Type": "application/json",
           },
+          withCredentials: true,
         }
       );
       if (data.success) {
@@ -121,6 +124,7 @@ const Appointment = () => {
         toast.error(data.message);
       }
     } catch (error) {
+      toast.error(error.message);
     } finally {
       setLoading(false);
     }
@@ -137,8 +141,6 @@ const Appointment = () => {
       getAvailableSlots();
     }
   }, [docInfo]);
-
-  console.log(docInfo);
 
   return (
     docInfo && (

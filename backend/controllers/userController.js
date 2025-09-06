@@ -8,42 +8,36 @@ import doctorModel from "../models/doctorModel.js";
 import appointmentModel from "../models/appointmentModel.js";
 
 import razorpay from "razorpay";
+import {
+  generateAccessToken,
+  generateAcessTokenAndRefreshToken,
+} from "../utils/sendToken.js";
 
 const registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
     if (!name || !password || !email) {
-      {
-        return res.json({
-          success: false,
-          message: "Missing Details",
-        });
-      }
+      return res.json({ success: false, message: "Missing Details" });
     }
 
-    // check if email already exists
-    const user1 = await userModel.findOne({ email });
-    if (user1) {
+    const existingUser = await userModel.findOne({ email });
+    if (existingUser) {
       return res
         .status(400)
         .json({ success: false, message: "Email already registered" });
     }
 
     if (!validator.isEmail(email)) {
-      return res.json({
-        success: false,
-        message: "All fields are required",
-      });
+      return res.json({ success: false, message: "Invalid email" });
     }
 
-    if (password.lenth < 8) {
+    if (password.length < 8) {
       return res.json({
         success: false,
-        message: "Enter a strong password",
+        message: "Password must be at least 8 characters",
       });
     }
-
     // hashing strong password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -55,13 +49,11 @@ const registerUser = async (req, res) => {
     };
 
     const newUser = new userModel(userData);
-    const user = await newUser.save();
-
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+    await newUser.save();
 
     res.json({
       success: true,
-      token,
+      message: "Registerd successfully",
     });
   } catch (error) {
     console.log(error);
@@ -87,7 +79,7 @@ const loginUser = async (req, res) => {
       }
     }
 
-    // check if email already exists
+    // check if email  exists
     const user1 = await userModel.findOne({ email });
     if (!user1) {
       return res
@@ -98,17 +90,123 @@ const loginUser = async (req, res) => {
     const isMatch = await bcrypt.compare(password, user1.password);
 
     if (isMatch) {
-      const token = jwt.sign({ id: user1._id }, process.env.JWT_SECRET);
-      res.json({
-        success: true,
-        token,
-      });
+      const { accessToken, refreshToken } =
+        await generateAcessTokenAndRefreshToken(user1._id);
+
+      const optionsForAccessToken = {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 1 * 60 * 60 * 1000,
+      };
+      const optionsForRefreshToken = {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 5 * 24 * 60 * 60 * 1000,
+      };
+      res
+        .cookie("accessToken", accessToken, optionsForAccessToken)
+        .cookie("refreshToken", refreshToken, optionsForRefreshToken)
+        .json({
+          success: true,
+          message: "Login successfully",
+        });
     } else {
-      return res.json({
+      return res.status(401).json({
         success: false,
         message: "Invalid Credentials",
       });
     }
+  } catch (error) {
+    console.log(error);
+    res.json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// generate new accessToken
+
+const refreshtToken = async (req, res) => {
+  try {
+    const { refreshToken } = req.cookies;
+
+    if (!refreshToken)
+      return res
+        .status(401)
+        .json({ success: false, message: "Missing refresh token" });
+
+    const user = await userModel.findOne({ refreshToken });
+
+    if (!user) {
+      return res.json({
+        success: false,
+        message: "Invalid refresh Token",
+      });
+    }
+
+    jwt.verify(
+      refreshToken,
+      process.env.REFRESH_TOKEN_SECRET,
+      async (error, decode) => {
+        if (error)
+          return res
+            .status(403)
+            .json({ message: "Invalid or expired refresh token" });
+
+        const accessToken = generateAccessToken(decode.id);
+
+        const optionsForAccessToken = {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+          maxAge: 1 * 60 * 60 * 1000,
+        };
+
+        res.cookie("accessToken", accessToken, optionsForAccessToken).json({
+          success: true,
+          message: "AcessToken refreshed",
+        });
+      }
+    );
+  } catch (error) {
+    res.json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+const logout = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const user = await userModel.findById(userId);
+
+    if (!user) {
+      res.json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    await userModel.findByIdAndUpdate(user._id, { refreshToken: null });
+
+    const options = {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+    };
+
+    res
+      .clearCookie("accessToken", options)
+      .clearCookie("refreshToken", options)
+      .json({
+        success: true,
+        messge: "Logout successfully",
+      });
   } catch (error) {
     console.log(error);
     res.json({
@@ -124,7 +222,9 @@ const getProfile = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    const userData = await userModel.findById(userId).select("-password");
+    const userData = await userModel
+      .findById(userId)
+      .select("-password -refreshToken");
     res.json({
       success: true,
       userData,
@@ -391,4 +491,6 @@ export {
   cancelAppointment,
   paymentRazorpay,
   verifyRazorpay,
+  refreshtToken,
+  logout,
 };

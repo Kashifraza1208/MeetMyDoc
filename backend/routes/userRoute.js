@@ -5,7 +5,9 @@ import {
   getProfile,
   listAppointment,
   loginUser,
+  logout,
   paymentRazorpay,
+  refreshtToken,
   registerUser,
   updateProfile,
   verifyRazorpay,
@@ -17,7 +19,9 @@ const userRouter = express.Router();
 
 userRouter.post("/register", registerUser);
 userRouter.post("/login", loginUser);
+userRouter.post("/logout", authUser, logout);
 userRouter.get("/get-profile", authUser, getProfile);
+userRouter.post("/refresh-token", refreshtToken);
 userRouter.post(
   "/update-profile",
   upload.single("image"),
