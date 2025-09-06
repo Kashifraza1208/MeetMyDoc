@@ -3,9 +3,10 @@ import { AppContext } from "../context/AppContext";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import axiosInstance from "../apis/axiosInstance";
 
 const MyAppointments = () => {
-  const { backendUrl, token, getAllDoctors } = useContext(AppContext);
+  const { backendUrl, getAllDoctors } = useContext(AppContext);
 
   const navigate = useNavigate();
   const [appointments, setAppointments] = useState([]);
@@ -41,10 +42,11 @@ const MyAppointments = () => {
   const getUserAppointment = async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get(`${backendUrl}/api/user/appointments`, {
+      const { data } = await axiosInstance.get(`/api/user/appointments`, {
         headers: {
-          token,
+          "Content-Type": "application/json",
         },
+        withCredentials: true,
       });
       if (data.success) {
         setAppointments(data.appointments.reverse());
@@ -60,13 +62,14 @@ const MyAppointments = () => {
 
   const cancelAppointment = async (appointmentId) => {
     try {
-      const { data } = await axios.post(
-        `${backendUrl}/api/user/cancel-appointment`,
+      const { data } = await axiosInstance.post(
+        `/api/user/cancel-appointment`,
         { appointmentId },
         {
           headers: {
-            token,
+            "Content-Type": "application/json",
           },
+          withCredentials: true,
         }
       );
       if (data.success) {
@@ -93,11 +96,14 @@ const MyAppointments = () => {
       receipt: order.receipt,
       handler: async (response) => {
         try {
-          const { data } = await axios.post(
-            `${backendUrl}/api/user/verifyRazorpay`,
+          const { data } = await axiosInstance.post(
+            `/api/user/verifyRazorpay`,
             response,
             {
-              headers: { token },
+              headers: {
+                "Content-Type": "application/json",
+              },
+              withCredentials: true,
             }
           );
           if (data.success) {
@@ -118,11 +124,14 @@ const MyAppointments = () => {
 
   const appointmentRazorpay = async (appointmentId) => {
     try {
-      const { data } = await axios.post(
-        `${backendUrl}/api/user/payment-razorpay`,
+      const { data } = await axiosInstance.post(
+        `/api/user/payment-razorpay`,
         { appointmentId },
         {
-          headers: { token },
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
         }
       );
       if (data.success) {
@@ -134,10 +143,8 @@ const MyAppointments = () => {
   };
 
   useEffect(() => {
-    if (token) {
-      getUserAppointment();
-    }
-  }, [token]);
+    getUserAppointment();
+  }, []);
 
   return (
     <div>

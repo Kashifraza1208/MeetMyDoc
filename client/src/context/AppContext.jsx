@@ -2,6 +2,7 @@ import { createContext, useEffect, useState } from "react";
 
 import axios from "axios";
 import { toast } from "react-toastify";
+import axiosInstance, { setLogoutHandler } from "../apis/axiosInstance";
 
 export const AppContext = createContext();
 
@@ -10,18 +11,16 @@ const AppContextProvider = (props) => {
 
   const [userData, setUserData] = useState(false);
 
-  const [loading, setLoading] = useState(false);
+  const [loadingUser, setLoadingUser] = useState(false);
+
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const [doctors, setDoctors] = useState([]);
-  const [token, setToken] = useState(
-    localStorage.getItem("token") ? localStorage.getItem("token") : false
-  );
-
+  axios.defaults.withCredentials = true;
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
   const getAllDoctors = async () => {
     try {
-      setLoading(true);
       const { data } = await axios.get(`${backendUrl}/api/doctor/list`);
       if (data.success) {
         setDoctors(data.doctors);
@@ -30,25 +29,29 @@ const AppContextProvider = (props) => {
       }
     } catch (error) {
       toast.error(error.message);
-    } finally {
-      setLoading(false);
     }
   };
 
   const loadUserProfileData = async () => {
     try {
-      const { data } = await axios.get(`${backendUrl}/api/user/get-profile`, {
+      setLoadingUser(true);
+      const { data } = await axiosInstance.get(`/api/user/get-profile`, {
         headers: {
-          token,
+          "Content-Type": "application/json",
         },
+        withCredentials: true,
       });
       if (data.success) {
         setUserData(data.userData);
+        setIsAuthenticated(true);
       } else {
-        toast.error(data.message);
+        setIsAuthenticated(false);
+        setUserData(false);
       }
     } catch (error) {
-      toast.error(error.message);
+      setIsAuthenticated(false);
+    } finally {
+      setLoadingUser(false);
     }
   };
 
@@ -57,24 +60,28 @@ const AppContextProvider = (props) => {
   }, []);
 
   useEffect(() => {
-    if (token) {
-      loadUserProfileData();
-    } else {
+    loadUserProfileData();
+  }, []);
+
+  useEffect(() => {
+    setLogoutHandler(() => {
+      setIsAuthenticated(false);
       setUserData(false);
-    }
-  }, [token]);
+      setLoadingUser(false);
+    });
+  }, []);
 
   const value = {
     doctors,
     currencySymbol,
     getAllDoctors,
-    token,
-    setToken,
+    setIsAuthenticated,
+    isAuthenticated,
     backendUrl,
     userData,
     setUserData,
     loadUserProfileData,
-    loading,
+    loadingUser,
   };
 
   return (

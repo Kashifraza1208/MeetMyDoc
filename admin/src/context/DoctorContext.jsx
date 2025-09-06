@@ -87,7 +87,7 @@ const DoctorContextProvider = (props) => {
           dToken,
         },
       });
-      console.log(data);
+
       if (data.success) {
         setProfileData(data.profileData);
       } else {

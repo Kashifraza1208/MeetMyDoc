@@ -10,8 +10,13 @@ import Appointment from "./pages/Appointment";
 import Navbar from "./components/Navbar";
 import { ToastContainer } from "react-toastify";
 import Footer from "./components/Footer";
+import ProtectedRoute from "./routes/ProtectedRoute";
+import { useContext } from "react";
+import { AppContext } from "./context/AppContext";
 
 const App = () => {
+  const { loadingUser, isAuthenticated } = useContext(AppContext);
+
   return (
     <div className="mx-4 sm:mx-[10%]">
       <Navbar />
@@ -22,8 +27,28 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
-        <Route path="/my-profile" element={<MyProfile />} />
-        <Route path="/my-appointments" element={<MyAppointments />} />
+        <Route
+          path="/my-profile"
+          element={
+            <ProtectedRoute
+              loadingUser={loadingUser}
+              isAuthenticated={isAuthenticated}
+            >
+              <MyProfile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/my-appointments"
+          element={
+            <ProtectedRoute
+              loadingUser={loadingUser}
+              isAuthenticated={isAuthenticated}
+            >
+              <MyAppointments />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/appointment/:docId" element={<Appointment />} />
       </Routes>
       <Footer />

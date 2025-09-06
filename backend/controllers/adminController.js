@@ -162,7 +162,6 @@ const getAllAppointments = async (req, res) => {
     if (appointments) {
       res.json({ success: true, appointments });
     } else {
-      console.log("no appointments found");
       res.json({ success: false, message: "No appointments available" });
     }
   } catch (error) {

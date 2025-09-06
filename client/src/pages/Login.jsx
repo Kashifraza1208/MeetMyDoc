@@ -3,13 +3,18 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { AppContext } from "../context/AppContext";
 import Loading from "../components/Loading";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { FaEye } from "react-icons/fa";
 import { FaEyeSlash } from "react-icons/fa6";
 
 const Login = () => {
-  const { token, setToken, backendUrl, loadUserProfileData } =
-    useContext(AppContext);
+  const {
+    backendUrl,
+    loadUserProfileData,
+    setIsAuthenticated,
+    isAuthenticated,
+    loadingUser,
+  } = useContext(AppContext);
   const navigate = useNavigate();
   const [state, setState] = useState("Login");
   const [email, setEmail] = useState("");
@@ -19,40 +24,60 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
+  const location = useLocation();
+
   const onSubmitHandler = async (e) => {
     e.preventDefault();
 
     try {
       if (state === "Sign Up") {
         setLoading(true);
-        const { data } = await axios.post(`${backendUrl}/api/user/register`, {
-          name,
-          email,
-          password,
-        });
+        const { data } = await axios.post(
+          `${backendUrl}/api/user/register`,
+          {
+            name,
+            email,
+            password,
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+            withCredentials: true,
+          }
+        );
         if (data.success) {
-          localStorage.setItem("token", data.token);
-          setToken(data.token);
           setEmail("");
           setName("");
           setPassword("");
-          toast.success("Registered successfully");
+          toast.success(data.message);
+          setState("Login");
         } else {
           toast.error(data.message);
         }
       } else {
         setLoading(true);
 
-        const { data } = await axios.post(`${backendUrl}/api/user/login`, {
-          email,
-          password,
-        });
+        const { data } = await axios.post(
+          `${backendUrl}/api/user/login`,
+          {
+            email,
+            password,
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+            withCredentials: true,
+          }
+        );
         if (data.success) {
-          localStorage.setItem("token", data.token);
-          setToken(data.token);
+          setIsAuthenticated(true);
+          scrollTo(0, 0);
+          loadUserProfileData();
           setEmail("");
           setPassword("");
-          toast.success("Login successfully");
+          toast.success(data.message);
         } else {
           toast.error(data.message);
         }
@@ -65,10 +90,19 @@ const Login = () => {
   };
 
   useEffect(() => {
-    if (token) {
-      navigate("/");
+    if (isAuthenticated) {
+      const from = location.state?.from?.pathname || "/";
+      navigate(from, { replace: true });
     }
-  }, [token, navigate]);
+  }, [isAuthenticated, navigate, location]);
+
+  if (loadingUser) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-white">
+        <div className="w-12 h-12 border-4 border-blue-500 border-dashed rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={onSubmitHandler} className="min-h-[80vh] flex items-center">
