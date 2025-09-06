@@ -127,6 +127,8 @@ const MyAppointments = () => {
       );
       if (data.success) {
         initPay(data.order);
+      } else {
+        toast.error(data.message);
       }
     } catch (error) {}
   };

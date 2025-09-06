@@ -4,16 +4,20 @@ import { toast } from "react-toastify";
 import { AppContext } from "../context/AppContext";
 import Loading from "../components/Loading";
 import { useNavigate } from "react-router-dom";
+import { FaEye } from "react-icons/fa";
+import { FaEyeSlash } from "react-icons/fa6";
 
 const Login = () => {
   const { token, setToken, backendUrl, loadUserProfileData } =
     useContext(AppContext);
   const navigate = useNavigate();
-  const [state, setState] = useState("Sign Up");
+  const [state, setState] = useState("Login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
@@ -98,15 +102,38 @@ const Login = () => {
             required
           />
         </div>
-        <div className="w-full">
+        <div className="w-full relative">
           <p>Password</p>
           <input
-            className="border border-zinc-300 rounded w-full p-2 mt-1"
-            type="password"
+            className="border  border-zinc-300 rounded w-full p-2 mt-1"
+            type={showPassword ? "text" : "password"}
             onChange={(e) => setPassword(e.target.value)}
             value={password}
             required
           />
+          {showPassword ? (
+            <FaEye
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute top-9 right-3 text-gray-400"
+            />
+          ) : (
+            <FaEyeSlash
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute top-9 right-3 text-gray-400"
+            />
+          )}
+        </div>
+
+        <div className="flex items-center justify-between text-xs">
+          <label className="flex items-center gap-2 text-xs font-normal">
+            <input
+              type="checkbox"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+              className="form-checkbox"
+            />{" "}
+            Remember me
+          </label>
         </div>
         <button
           type="submit"
