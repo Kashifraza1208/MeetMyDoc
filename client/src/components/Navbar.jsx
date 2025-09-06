@@ -1,7 +1,8 @@
 import { useContext, useState } from "react";
 import { assets } from "../assets/assets";
-import { NavLink, useNavigate } from "react-router-dom";
-
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
+import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { AppContext } from "../context/AppContext";
 
 const Navbar = () => {
@@ -9,6 +10,8 @@ const Navbar = () => {
   const { token, setToken, userData } = useContext(AppContext);
 
   const [showMenu, setShowMenu] = useState(false);
+
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const handleLogout = () => {
     setToken("");
@@ -48,32 +51,51 @@ const Navbar = () => {
       </ul>
       <div className="flex items-center gap-4">
         {token && userData ? (
-          <div className="flex items-center gap-2 cursor-pointer group relative">
-            <img className="w-8 rounded-full" src={userData.image} alt="" />
-            <img className="w-2.5" src={assets.dropdown_icon} alt="" />
-            <div className="absolute top-0 right-0 pt-14 text-base font-medium text-gray-500 z-20 hidden group-hover:block">
-              <div className="min-w-44 bg-stone-100 rounded flex flex-col gap-4 p-4">
-                <p
-                  onClick={() => navigate("my-profile")}
-                  className="hover:text-black cursor-pointer"
-                >
-                  My Profile
-                </p>
-                <p
-                  onClick={() => navigate("my-appointments")}
-                  className="hover:text-black cursor-pointer"
-                >
-                  My Appointments
-                </p>
-                <p
-                  onClick={handleLogout}
-                  className="hover:text-black cursor-pointer"
-                >
-                  Logout
-                </p>
+          <Menu as="div" className="relative inline-block">
+            <MenuButton className="inline-flex border border-gray-100 w-full justify-center gap-x-1.5 rounded-md bg-white/10 md:px-3 px-1.5 py-1 text-sm font-semibold text-white inset-ring-1 inset-ring-white/5 hover:bg-white/20">
+              <img className="w-8 rounded-full" src={userData.image} alt="" />
+
+              <ChevronDownIcon
+                aria-hidden="true"
+                className="-mr-1 size-5 text-gray-400"
+              />
+            </MenuButton>
+
+            <MenuItems
+              transition
+              className="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-gray-800 outline-1 -outline-offset-1 outline-white/10 transition data-closed:scale-95 data-closed:transform data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in"
+            >
+              <div className="py-1">
+                <MenuItem>
+                  <Link
+                    to={"/my-profile"}
+                    className="block px-4 py-2 text-sm text-gray-300 data-focus:bg-white/5 data-focus:text-white data-focus:outline-hidden"
+                  >
+                    My Profile
+                  </Link>
+                </MenuItem>
+                <MenuItem>
+                  <Link
+                    to={"/my-appointments"}
+                    className="block px-4 py-2 text-sm text-gray-300 data-focus:bg-white/5 data-focus:text-white data-focus:outline-hidden"
+                  >
+                    My Appointments
+                  </Link>
+                </MenuItem>
+
+                <form onSubmit={handleLogout}>
+                  <MenuItem>
+                    <button
+                      type="submit"
+                      className="block cursor-pointer w-full px-4 py-2 text-left text-sm text-gray-300 data-focus:bg-white/5 data-focus:text-white data-focus:outline-hidden"
+                    >
+                      Sign out
+                    </button>
+                  </MenuItem>
+                </form>
               </div>
-            </div>
-          </div>
+            </MenuItems>
+          </Menu>
         ) : (
           <button
             onClick={() => navigate("/login")}
@@ -129,6 +151,12 @@ const Navbar = () => {
             <NavLink onClick={() => setShowMenu(false)} to="/contact">
               <p className="px-4 py-2 rounded inline-block">CONTACT</p>
             </NavLink>
+            <button
+              onClick={() => navigate("/login")}
+              className="bg-[var(--primary)] text-center  text-white px-8 py-3 rounded-full font-light  block md:hidden"
+            >
+              Create Account
+            </button>
           </ul>
         </div>
       </div>

@@ -44,7 +44,7 @@ const Header = () => {
             className={`flex relative flex-col md:flex-row items-center justify-between ${header.bgColor} px-6 md:px-10 lg:px-20 pt-10 md:py-20`}
           >
             {/* Left Side (Text) */}
-            <div className="w-full md:w-1/2 flex flex-col gap-6 text-left z-10">
+            <div className="w-full md:w-1/2 items-center justify-center md:items-start md:justify-start flex flex-col gap-6 text-left z-10">
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-semibold text-white leading-tight">
                 {header.title}
               </h1>
@@ -56,7 +56,7 @@ const Header = () => {
               </div>
               <a
                 href="#speciality"
-                className="flex items-center gap-2 bg-white px-8 py-3 rounded-full text-gray-700 text-sm w-fit hover:scale-105 transition-all duration-300"
+                className="flex items-center  justify-center gap-2 bg-white px-8 py-3 rounded-full text-gray-700 text-sm w-fit hover:scale-105 transition-all duration-300"
               >
                 Book appointment
                 <svg
