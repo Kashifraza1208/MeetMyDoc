@@ -45,40 +45,50 @@ const DoctorsList = () => {
         </div>
 
         {loading ? (
-          <div className="flex items-center ">
-            <Loading />
-          </div>
+          Array(8)
+            .fill("")
+            .map((_, i) => (
+              <div
+                key={i}
+                className="border border-gray-200 rounded-xl p-4 animate-pulse"
+              >
+                <div className="h-32 bg-gray-200 rounded mb-4"></div>
+                <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+              </div>
+            ))
         ) : (
           <div className="grid grid-cols-auto  gap-4 gap-y-6">
-            {filteredData.map((doctor) => (
-              <div
-                key={doctor._id}
-                className="border border-indigo-200 rounded-xl max-w-56 overflow-hidden cursor-pointer group"
-              >
-                <img
-                  src={doctor.image}
-                  className="bg-indigo-50 group-hover:bg-[var(--primary)]  transition-all duration-500"
-                  alt={doctor.name}
-                />
-                <div className="p-4">
-                  <p className="text-neutral-800 text-lg font-medium">
-                    {doctor.name}
-                  </p>
-                  <p className="text-zinc-600 text-sm">{doctor.speciality}</p>
-                  <div className="mt-2 flex items-center gap-1 text-sm">
-                    <input
-                      id={doctor._id}
-                      type="checkbox"
-                      checked={doctor.available}
-                      onChange={() => changeAvailablity(doctor._id)}
-                    />
-                    <label htmlFor={doctor._id}>
-                      <p>available</p>
-                    </label>
+            {filteredData.length > 0 &&
+              filteredData.map((doctor) => (
+                <div
+                  key={doctor._id}
+                  className="border border-indigo-200 rounded-xl max-w-56 overflow-hidden cursor-pointer group"
+                >
+                  <img
+                    src={doctor.image}
+                    className="bg-indigo-50 group-hover:bg-[var(--primary)]  transition-all duration-500"
+                    alt={doctor.name}
+                  />
+                  <div className="p-4">
+                    <p className="text-neutral-800 text-lg font-medium">
+                      {doctor.name}
+                    </p>
+                    <p className="text-zinc-600 text-sm">{doctor.speciality}</p>
+                    <div className="mt-2 flex items-center gap-1 text-sm">
+                      <input
+                        id={doctor._id}
+                        type="checkbox"
+                        checked={doctor.available}
+                        onChange={() => changeAvailablity(doctor._id)}
+                      />
+                      <label htmlFor={doctor._id}>
+                        <p>available</p>
+                      </label>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         )}
       </div>

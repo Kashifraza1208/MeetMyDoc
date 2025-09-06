@@ -3,7 +3,7 @@ import { AppContext } from "../context/AppContext";
 import { useNavigate } from "react-router-dom";
 
 const RelatedDoctors = ({ docId, speciality }) => {
-  const { doctors } = useContext(AppContext);
+  const { doctors, loading } = useContext(AppContext);
   const [relDocs, setRelDocs] = useState([]);
 
   const fetchRelatedDoctor = () => {
@@ -33,34 +33,54 @@ const RelatedDoctors = ({ docId, speciality }) => {
         </p>
       </div>
       <div className="w-full grid grid-cols-auto gap-4 pt-5 gap-y-6 px-3 sm:px-0">
-        {relDocs.map((doctor, index) => (
-          <div
-            key={index}
-            onClick={() => {
-              navigate(`/appointment/${doctor._id}`);
-              scrollTo(0, 0);
-            }}
-            className="border border-blue-200 rounded-xl overflow-hidden cursor-pointer hover:translate-y-[-10px] transition-all duration-500"
-          >
-            <img src={doctor.image} alt={doctor.name} className="bg-blue-50" />
-            <div className="p-4">
+        {loading
+          ? Array(4)
+              .fill("")
+              .map((_, i) => (
+                <div
+                  key={i}
+                  className="border border-gray-200 rounded-xl p-4 animate-pulse"
+                >
+                  <div className="h-32 bg-gray-200 rounded mb-4"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+                </div>
+              ))
+          : relDocs.length > 0 &&
+            relDocs.map((doctor, index) => (
               <div
-                className={`flex items-center gap-2 text-sm text-center ${
-                  doctor.available ? "bg-green-500" : "bg-gray-500"
-                }}`}
+                key={index}
+                onClick={() => {
+                  navigate(`/appointment/${doctor._id}`);
+                  scrollTo(0, 0);
+                }}
+                className="border border-blue-200 rounded-xl overflow-hidden cursor-pointer hover:translate-y-[-10px] transition-all duration-500"
               >
-                <p
-                  className={`${
-                    doctor.available ? "bg-green-500" : "bg-gray-500"
-                  } rounded-full w-2 h-2`}
-                ></p>
-                <p>{doctor.available ? "Available" : "Not Available"}</p>
+                <img
+                  src={doctor.image}
+                  alt={doctor.name}
+                  className="bg-blue-50"
+                />
+                <div className="p-4">
+                  <div
+                    className={`flex items-center gap-2 text-sm text-center ${
+                      doctor.available ? "bg-green-500" : "bg-gray-500"
+                    }}`}
+                  >
+                    <p
+                      className={`${
+                        doctor.available ? "bg-green-500" : "bg-gray-500"
+                      } rounded-full w-2 h-2`}
+                    ></p>
+                    <p>{doctor.available ? "Available" : "Not Available"}</p>
+                  </div>
+                  <p className="text-gray-900 text-lg font-medium">
+                    {doctor.name}
+                  </p>
+                  <p className="text-gray-600 text-sm">{doctor.speciality}</p>
+                </div>
               </div>
-              <p className="text-gray-900 text-lg font-medium">{doctor.name}</p>
-              <p className="text-gray-600 text-sm">{doctor.speciality}</p>
-            </div>
-          </div>
-        ))}
+            ))}
       </div>
       <button
         onClick={() => {
