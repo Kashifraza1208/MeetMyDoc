@@ -10,6 +10,8 @@ const AdminContextProvider = (props) => {
     localStorage.getItem("aToken") ? localStorage.getItem("aToken") : ""
   );
   const [doctors, setDoctors] = useState([]);
+  const [loadingDash, setLoadingDash] = useState(false);
+  const [loadingAppointment, setLoadingDashAppointment] = useState(false);
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [loading, setLoading] = useState(false);
   const [appointments, setAppointments] = useState([]);
@@ -60,6 +62,7 @@ const AdminContextProvider = (props) => {
 
   const getAllAppointments = async () => {
     try {
+      setLoadingDashAppointment(true);
       const { data } = await axios.get(
         `${backendUrl}/api/admin/all-appointments`,
         {
@@ -76,6 +79,8 @@ const AdminContextProvider = (props) => {
     } catch (error) {
       console.log(error);
       toast.error(error.message);
+    } finally {
+      setLoadingDashAppointment(false);
     }
   };
 
@@ -104,6 +109,7 @@ const AdminContextProvider = (props) => {
 
   const getDashboardData = async () => {
     try {
+      setLoadingDash(true);
       const { data } = await axios.get(`${backendUrl}/api/admin/dashboard`, {
         headers: {
           aToken,
@@ -116,6 +122,8 @@ const AdminContextProvider = (props) => {
       }
     } catch (error) {
       toast.error(error.message);
+    } finally {
+      setLoadingDash(false);
     }
   };
 
@@ -133,6 +141,8 @@ const AdminContextProvider = (props) => {
     cancelAppointment,
     getDashboardData,
     dashData,
+    loadingDash,
+    loadingAppointment,
   };
 
   return (

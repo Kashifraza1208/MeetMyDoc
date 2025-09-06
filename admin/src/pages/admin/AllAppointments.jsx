@@ -1,16 +1,20 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { assets } from "../../assets/assets";
 import { AdminContext } from "../../context/AdminContext";
 import { AppContext } from "../../context/AppContext";
-import { useState } from "react";
+import AppointmentLoading from "../../components/AppointmentLoading";
 
 const AllAppointments = () => {
-  const { aToken, getAllAppointments, appointments, cancelAppointment } =
-    useContext(AdminContext);
+  const {
+    aToken,
+    getAllAppointments,
+    appointments,
+    cancelAppointment,
+    loadingAppointment,
+  } = useContext(AdminContext);
 
   const [searchQuery, setSearchQuery] = useState("");
-
   const { calculateAge, slotDateFormat } = useContext(AppContext);
 
   useEffect(() => {
@@ -21,16 +25,20 @@ const AllAppointments = () => {
 
   const filteredData = appointments.filter((item) => {
     if (item && item.userData && item.docData) {
-      const matchFilterPatientName = item.userData.name
+      const matchPatient = item.userData.name
         .toLowerCase()
         .includes(searchQuery.toLowerCase());
-
-      const matchFitlerDoctorName = item.docData.name
+      const matchDoctor = item.docData.name
         .toLowerCase()
         .includes(searchQuery.toLowerCase());
-      return matchFilterPatientName || matchFitlerDoctorName;
+      return matchPatient || matchDoctor;
     }
+    return false;
   });
+
+  if (loadingAppointment) {
+    return <AppointmentLoading />;
+  }
 
   return (
     <div className=" w-full  md:ml-52 md:left-52 md:w-[calc(100%-208px)]">

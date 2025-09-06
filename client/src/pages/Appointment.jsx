@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { assets } from "../assets/assets";
 import { AppContext } from "../context/AppContext";
 import RelatedDoctors from "../components/RelatedDoctors";
+import Loading from "../components/Loading";
 
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -18,6 +19,8 @@ const Appointment = () => {
   const [docSlots, setDocSlots] = useState([]);
   const [slotIndex, setSlotIndex] = useState(0);
   const [slotTime, setSlotTime] = useState("");
+
+  const [loading, setLoading] = useState(false);
 
   const fetchDocInfo = async () => {
     const doc = doctors.find((doc) => doc._id === docId);
@@ -92,6 +95,7 @@ const Appointment = () => {
       return navigate("/login");
     }
     try {
+      setLoading(true);
       const date = docSlots[slotIndex][0].dateTime;
       let day = date.getDate();
       let month = date.getMonth() + 1;
@@ -115,7 +119,10 @@ const Appointment = () => {
       } else {
         toast.error(data.message);
       }
-    } catch (error) {}
+    } catch (error) {
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -129,6 +136,8 @@ const Appointment = () => {
       getAvailableSlots();
     }
   }, [docInfo]);
+
+  console.log(docInfo);
 
   return (
     docInfo && (
@@ -157,6 +166,17 @@ const Appointment = () => {
                 {docInfo?.experience}
               </button>
             </div>
+
+            <p className=" text-sm mt-2">
+              Availablity :{" "}
+              <span
+                className={`${
+                  docInfo.available ? "text-green-500" : "text-gray-600"
+                }`}
+              >
+                {docInfo?.available ? "Available" : "Not Available"}
+              </span>
+            </p>
 
             {/* Doctor's description */}
             <div>
@@ -216,9 +236,9 @@ const Appointment = () => {
           </div>
           <button
             onClick={bookAppointment}
-            className="bg-[var(--primary)] text-sm text-white font-light px-14 py-3 rounded-full my-6"
+            className="bg-[var(--primary)] flex items-center justify-center cursor-pointer text-sm text-white font-light px-14 py-3 rounded-full my-6"
           >
-            Book an appointment
+            Book an appointment {loading && <Loading />}
           </button>
         </div>
 
