@@ -2,7 +2,7 @@ import { useState } from "react";
 import { createContext } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import axiosInstance from "../apis/axiosInstance";
+import axiosInstance, { setLogoutHandler } from "../apis/axiosInstance";
 import { useEffect } from "react";
 
 export const AdminContext = createContext();
@@ -188,6 +188,13 @@ const AdminContextProvider = (props) => {
 
   useEffect(() => {
     checkAuth();
+  }, []);
+
+  useEffect(() => {
+    setLogoutHandler(() => {
+      setIsAuthenticated(false);
+      setLoadingAuth(false);
+    });
   }, []);
 
   const value = {
