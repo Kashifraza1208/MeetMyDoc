@@ -20,6 +20,8 @@ const AdminContextProvider = (props) => {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [loading, setLoading] = useState(false);
   const [appointments, setAppointments] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [loadingUsers, setLoadingUsers] = useState(false);
 
   const [dashData, setDashData] = useState(false);
 
@@ -90,6 +92,28 @@ const AdminContextProvider = (props) => {
       toast.error(error.message);
     } finally {
       setLoadingDashAppointment(false);
+    }
+  };
+
+  const getAllPatients = async () => {
+    try {
+      setLoadingUsers(true);
+      const { data } = await axiosInstance.get(`/api/admin/all-users`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      });
+      if (data.success) {
+        setUsers(data.users);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message);
+    } finally {
+      setLoadingUsers(false);
     }
   };
 
@@ -184,6 +208,9 @@ const AdminContextProvider = (props) => {
     setIsAuthenticated,
     loadingAuth,
     checkAuth,
+    getAllPatients,
+    users,
+    loadingUsers,
   };
 
   return (

@@ -140,15 +140,6 @@ const refreshtToken = async (req, res) => {
         .status(401)
         .json({ success: false, message: "Missing refresh token" });
 
-    const user = await userModel.findOne({ refreshToken });
-
-    if (!user) {
-      return res.json({
-        success: false,
-        message: "Invalid refresh Token",
-      });
-    }
-
     jwt.verify(
       refreshToken,
       process.env.REFRESH_TOKEN_SECRET,
@@ -158,7 +149,12 @@ const refreshtToken = async (req, res) => {
             .status(403)
             .json({ message: "Invalid or expired refresh token" });
 
-        const accessToken = generateAccessToken(decode.id);
+        const user = await userModel.findById(decode.id);
+        if (!user || user.refreshToken !== refreshToken) {
+          return res.status(403).json({ message: "Invalid refresh token" });
+        }
+
+        const accessToken = generateAccessToken(user._id);
 
         const optionsForAccessToken = {
           httpOnly: true,
@@ -381,7 +377,7 @@ const listAppointment = async (req, res) => {
 const cancelAppointment = async (req, res) => {
   try {
     const userId = req.user.id;
-    console.log(userId, "==========>");
+
     const { appointmentId } = req.body;
     const appointmentData = await appointmentModel.findById(appointmentId);
 

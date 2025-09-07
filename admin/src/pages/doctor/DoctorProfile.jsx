@@ -38,8 +38,6 @@ const DoctorProfile = () => {
     }
   };
 
-  console.log(profileData, "hello");
-
   if (!profileData) return null;
 
   return (

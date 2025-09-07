@@ -115,7 +115,7 @@ const Dashboard = () => {
               {dashData.latestAppointments.map((appointment) => (
                 <div
                   key={appointment._id}
-                  className="flex flex-wrap items-center px-6 py-4 gap-4 hover:bg-gray-50 transition"
+                  className="flex border-gray-200 border flex-wrap items-center px-6 py-4 gap-4 hover:bg-gray-50 transition"
                 >
                   <img
                     className="rounded-full ring-2 ring-sky-300/20 w-12 h-12 object-cover"

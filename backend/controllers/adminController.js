@@ -270,6 +270,27 @@ const allDoctors = async (req, res) => {
   }
 };
 
+//API to get all patient list for admin panel
+
+const allPatients = async (req, res) => {
+  try {
+    const users = await userModel
+      .find({})
+      .select({ password: 0, refreshToken: 0 });
+    res.json({
+      success: true,
+      message: "Data Fetched",
+      users,
+    });
+  } catch (error) {
+    console.log(error);
+    res.json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 //API to get all appointment list
 
 const getAllAppointments = async (req, res) => {
@@ -376,4 +397,5 @@ export {
   refreshtToken,
   logout,
   getAdminInfo,
+  allPatients,
 };
