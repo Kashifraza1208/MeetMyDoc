@@ -3,6 +3,7 @@ import {
   addDoctor,
   adminDashboard,
   allDoctors,
+  allPatients,
   cancelAppointmentForAdmin,
   getAdminInfo,
   getAllAppointments,
@@ -25,5 +26,6 @@ adminRouter.get("/all-appointments", authAdmin, getAllAppointments);
 adminRouter.post("/cancel-appointment", authAdmin, cancelAppointmentForAdmin);
 adminRouter.get("/dashboard", authAdmin, adminDashboard);
 adminRouter.get("/me", authAdmin, getAdminInfo);
+adminRouter.get("/all-users", authAdmin, allPatients);
 
 export default adminRouter;

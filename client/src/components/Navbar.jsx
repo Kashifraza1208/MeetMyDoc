@@ -181,7 +181,10 @@ const Navbar = () => {
               <p className="px-4 py-2 rounded inline-block">CONTACT</p>
             </NavLink>
             <button
-              onClick={() => navigate("/login")}
+              onClick={() => {
+                setShowMenu(false);
+                navigate("/login");
+              }}
               className="bg-[var(--primary)] text-center  text-white px-8 py-3 rounded-full font-light  block md:hidden"
             >
               Create Account

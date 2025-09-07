@@ -106,7 +106,7 @@ const loginDoctor = async (req, res) => {
 
 // generate new accessToken
 
-const refreshtToken = async (req, res) => {
+const refreshToken = async (req, res) => {
   try {
     const { refreshToken } = req.cookies;
 
@@ -126,22 +126,14 @@ const refreshtToken = async (req, res) => {
 
         const docId = decode.id;
 
+        console.log(docId, "==========>");
+
         const doctor = await doctorModel.findById(docId);
-        if (!doctor) {
-          return res.json({
-            success: false,
-            message: "Invalid refresh Token",
-          });
+        if (!doctor || doctor.refreshToken !== refreshToken) {
+          return res.status(403).json({ message: "Invalid refresh token" });
         }
 
-        if (refreshToken !== doctor.refreshToken) {
-          return res.json({
-            success: false,
-            message: "Invalid or expired refresh token",
-          });
-        }
-
-        const accessToken = generateAccessToken(doctor.id);
+        const accessToken = generateAccessToken(doctor._id);
 
         const optionsForAccessToken = {
           httpOnly: true,
@@ -379,6 +371,6 @@ export {
   doctorDashbaord,
   doctorProfile,
   updateDoctorProfile,
-  refreshtToken,
+  refreshToken,
   logout,
 };

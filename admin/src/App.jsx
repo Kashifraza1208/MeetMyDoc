@@ -17,6 +17,7 @@ import DoctorAppointments from "./pages/doctor/DoctorAppointments.jsx";
 import DoctorDashboard from "./pages/doctor/DoctorDashboard.jsx";
 import DoctorProfile from "./pages/doctor/DoctorProfile.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import PatientList from "./pages/admin/PatientList.jsx";
 
 const App = () => {
   const adminCtx = useContext(AdminContext);
@@ -82,6 +83,15 @@ const App = () => {
                 element={
                   <ProtectedRoute isAuthenticated={isAuthenticated}>
                     <DoctorsList />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/patient-list"
+                element={
+                  <ProtectedRoute isAuthenticated={isAuthenticated}>
+                    <PatientList />
                   </ProtectedRoute>
                 }
               />

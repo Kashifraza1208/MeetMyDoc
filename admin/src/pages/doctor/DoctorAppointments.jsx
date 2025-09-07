@@ -42,14 +42,14 @@ const DoctorAppointments = () => {
                 <p className="max-sm:hidden">{index + 1}</p>
                 <div className="flex items-center gap-2">
                   <img
-                    className="w-8 rounded-full"
+                    className="w-8 h-8 object-cover rounded-full"
                     src={appointment.userData.image}
                     alt={appointment.userData.name}
                   />
                   <p>{appointment.userData.name}</p>
                 </div>
                 <div>
-                  <p className="text-sm inline border border-primary px-2 rounded-full">
+                  <p className="text-sm inline border border-[var(--primary)] px-2 rounded-full">
                     {appointment.payment ? "Online" : "Cash"}
                   </p>
                 </div>
