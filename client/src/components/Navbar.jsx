@@ -4,13 +4,13 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { AppContext } from "../context/AppContext";
-import axios from "axios";
+
 import { toast } from "react-toastify";
 import axiosInstance from "../apis/axiosInstance";
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const { userData, backendUrl, isAuthenticated, setIsAuthenticated } =
+  const { userData, setUserData, isAuthenticated, setIsAuthenticated } =
     useContext(AppContext);
 
   const [showMenu, setShowMenu] = useState(false);
@@ -19,7 +19,7 @@ const Navbar = () => {
     e.preventDefault();
     try {
       const { data } = await axiosInstance.post(
-        `${backendUrl}/api/user/logout`,
+        `/api/user/logout`,
         {},
         {
           headers: {
@@ -32,6 +32,7 @@ const Navbar = () => {
       if (data.success) {
         setIsAuthenticated(false);
         toast.success(data.message);
+        setUserData(false);
         navigate("/login");
         window.scrollTo(0, 0);
       } else {
@@ -77,7 +78,11 @@ const Navbar = () => {
         {isAuthenticated && userData ? (
           <Menu as="div" className="relative inline-block">
             <MenuButton className="inline-flex border border-gray-100 w-full justify-center gap-x-1.5 rounded-md bg-white/10 md:px-3 px-1.5 py-1 text-sm font-semibold text-white inset-ring-1 inset-ring-white/5 hover:bg-white/20">
-              <img className="w-8 rounded-full" src={userData.image} alt="" />
+              <img
+                className="w-8 h-8 rounded-full object-cover"
+                src={userData.image}
+                alt=""
+              />
 
               <ChevronDownIcon
                 aria-hidden="true"

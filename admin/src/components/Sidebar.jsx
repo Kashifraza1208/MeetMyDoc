@@ -5,8 +5,12 @@ import { assets } from "../assets/assets";
 import { DoctorContext } from "../context/DoctorContext";
 
 const Sidebar = () => {
-  const { aToken } = useContext(AdminContext);
-  const { dToken } = useContext(DoctorContext);
+  const doctorCtx = useContext(DoctorContext);
+
+  const adminCtx = useContext(AdminContext);
+
+  const isAuthenticated = adminCtx?.isAuthenticated || false;
+  const isAuthenticatedDoctor = doctorCtx?.isAuthenticatedDoctor || false;
 
   const linksAdmin = [
     { to: "/admin-dashboard", label: "Dashboard", icon: assets.home_icon },
@@ -29,7 +33,11 @@ const Sidebar = () => {
     { to: "/doctor-profile", label: "Profile", icon: assets.people_icon },
   ];
 
-  const activeLinks = aToken ? linksAdmin : dToken ? linksDoctor : [];
+  const activeLinks = isAuthenticated
+    ? linksAdmin
+    : isAuthenticatedDoctor
+    ? linksDoctor
+    : [];
 
   return (
     <div className="h-[calc(100vh-56px)] fixed top-14 bottom-0 bg-white border-r border-gray-200  flex flex-col">

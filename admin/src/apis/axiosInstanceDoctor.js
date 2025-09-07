@@ -23,7 +23,7 @@ axiosInstance.interceptors.response.use(
       try {
         // Try refreshing token
         await axios.post(
-          `${backendUrl}/api/user/refresh-token`,
+          `${backendUrl}/api/doctor/refresh-token`,
           {},
           { withCredentials: true }
         );

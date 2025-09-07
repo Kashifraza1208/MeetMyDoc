@@ -2,18 +2,40 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.jsx";
 import { BrowserRouter } from "react-router-dom";
-import AppContextProvider from "./context/AppContext.jsx";
+import AppContextProvider, { AppContext } from "./context/AppContext.jsx";
 import DoctorContextProvider from "./context/DoctorContext.jsx";
 import AdminContextProvider from "./context/AdminContext.jsx";
 
-createRoot(document.getElementById("root")).render(
-  <BrowserRouter>
-    <AdminContextProvider>
+import { useContext } from "react";
+
+// eslint-disable-next-line react-refresh/only-export-components
+const RoleWrapper = () => {
+  const { role } = useContext(AppContext);
+
+  if (role === "Doctor")
+    return (
+      <DoctorContextProvider>
+        <App />
+      </DoctorContextProvider>
+    );
+  if (role === "Admin")
+    return (
+      <AdminContextProvider>
+        <App />
+      </AdminContextProvider>
+    );
+  return <App />;
+};
+
+// eslint-disable-next-line react-refresh/only-export-components
+const Root = () => {
+  return (
+    <BrowserRouter>
       <AppContextProvider>
-        <DoctorContextProvider>
-          <App />
-        </DoctorContextProvider>
+        <RoleWrapper />
       </AppContextProvider>
-    </AdminContextProvider>
-  </BrowserRouter>
-);
+    </BrowserRouter>
+  );
+};
+
+createRoot(document.getElementById("root")).render(<Root />);

@@ -3,19 +3,23 @@ import { FaSearch } from "react-icons/fa";
 import { useContext } from "react";
 import { AdminContext } from "../../context/AdminContext";
 import { useEffect } from "react";
-import Loading from "../../components/Loading";
 import { useState } from "react";
 
 const DoctorsList = () => {
-  const { doctors, aToken, getAllDoctors, loading, changeAvailablity } =
-    useContext(AdminContext);
+  const {
+    isAuthenticated,
+    doctors,
+    getAllDoctors,
+    loading,
+    changeAvailablity,
+  } = useContext(AdminContext);
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
-    if (aToken) {
+    if (isAuthenticated) {
       getAllDoctors();
     }
-  }, [aToken]);
+  }, [isAuthenticated]);
 
   const filteredData = doctors.filter((item) => {
     if (item) {

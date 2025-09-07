@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 const authUser = async (req, res, next) => {
   try {
     const { accessToken } = req.cookies;
+
     if (!accessToken) {
       return res.status(401).json({
         success: false,

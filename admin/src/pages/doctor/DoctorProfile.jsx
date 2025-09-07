@@ -1,12 +1,13 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState } from "react";
 import { DoctorContext } from "../../context/DoctorContext";
-import axios from "axios";
+
 import { toast } from "react-toastify";
 import { FaUserMd, FaMapMarkerAlt, FaRupeeSign } from "react-icons/fa";
 import { MdEdit, MdSave } from "react-icons/md";
+import axiosInstance from "../../apis/axiosInstanceDoctor";
 
 const DoctorProfile = () => {
-  const { profileData, setProfileData, dToken, getProfileData, backendUrl } =
+  const { profileData, setProfileData, getProfileData } =
     useContext(DoctorContext);
   const [isEdit, setIsEdit] = useState(false);
 
@@ -17,11 +18,11 @@ const DoctorProfile = () => {
         fees: profileData.fees,
         available: profileData.available,
       };
-      const { data } = await axios.post(
-        `${backendUrl}/api/doctor/update-profile`,
+      const { data } = await axiosInstance.post(
+        `/api/doctor/update-profile`,
         updateData,
         {
-          headers: { dToken },
+          withCredentials: true,
         }
       );
       if (data.success) {
@@ -37,11 +38,7 @@ const DoctorProfile = () => {
     }
   };
 
-  useEffect(() => {
-    if (dToken) {
-      getProfileData();
-    }
-  }, [dToken]);
+  console.log(profileData, "hello");
 
   if (!profileData) return null;
 

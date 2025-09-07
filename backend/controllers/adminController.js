@@ -108,15 +108,41 @@ const addDoctor = async (req, res) => {
 const loginAdmin = async (req, res) => {
   try {
     const { email, password } = req.body;
+    const payload = {
+      email,
+      role: "admin",
+    };
     if (
       email === process.env.ADMIN_EMAIL &&
       password === process.env.ADMIN_PASSWORD
     ) {
-      const token = jwt.sign(email + password, process.env.JWT_SECRET);
-      res.json({
-        success: true,
-        token,
+      const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
+        expiresIn: process.env.ACCESS_TOKEN_EXPIRE,
       });
+
+      const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, {
+        expiresIn: process.env.REFRESH_TOKEN_EXPIRE,
+      });
+      const optionsForAccessToken = {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+        maxAge: 1 * 60 * 60 * 1000,
+      };
+      const optionsForRefreshToken = {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+        maxAge: 5 * 24 * 60 * 60 * 1000,
+      };
+
+      res
+        .cookie("accessToken", accessToken, optionsForAccessToken)
+        .cookie("refreshToken", refreshToken, optionsForRefreshToken)
+        .json({
+          success: true,
+          message: "Login successfully",
+        });
     } else {
       res.json({
         success: false,
@@ -132,11 +158,104 @@ const loginAdmin = async (req, res) => {
   }
 };
 
+//API got refrsh new accessToken
+const refreshtToken = async (req, res) => {
+  try {
+    const { refreshToken } = req.cookies;
+
+    if (!refreshToken)
+      return res
+        .status(401)
+        .json({ success: false, message: "Missing refresh token" });
+
+    jwt.verify(
+      refreshToken,
+      process.env.REFRESH_TOKEN_SECRET,
+      async (error, decode) => {
+        if (error)
+          return res
+            .status(403)
+            .json({ message: "Invalid or expired refresh token" });
+
+        const payload = {
+          email: decode.email,
+          role: "admin",
+        };
+        const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
+          expiresIn: process.env.ACCESS_TOKEN_EXPIRE,
+        });
+
+        const optionsForAccessToken = {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+          maxAge: 1 * 60 * 60 * 1000,
+        };
+
+        res.cookie("accessToken", accessToken, optionsForAccessToken).json({
+          success: true,
+          message: "AcessToken refreshed",
+        });
+      }
+    );
+  } catch (error) {
+    res.json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+const logout = async (req, res) => {
+  try {
+    const options = {
+      httpOnly: true,
+      secure: true,
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+    };
+
+    res
+      .clearCookie("accessToken", options)
+      .clearCookie("refreshToken", options)
+      .json({
+        success: true,
+        message: "Logout successfully",
+      });
+  } catch (error) {
+    console.log(error);
+    res.json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+//API to get profile information
+
+const getAdminInfo = async (req, res) => {
+  try {
+    res.json({
+      success: true,
+      admin: {
+        email: process.env.ADMIN_EMAIL,
+        role: "admin",
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 //API to get all doctors list for admin panel
 
 const allDoctors = async (req, res) => {
   try {
-    const doctors = await doctorModel.find({}).select("-password");
+    const doctors = await doctorModel
+      .find({})
+      .select({ password: 0, refreshToken: 0 });
     res.json({
       success: true,
       message: "Data Fetched",
@@ -212,9 +331,14 @@ const cancelAppointmentForAdmin = async (req, res) => {
 
 const adminDashboard = async (req, res) => {
   try {
-    const doctors = await doctorModel.find({});
-    const users = await userModel.find({});
-    const appointments = await appointmentModel.find({});
+    const doctors = await doctorModel
+      .find({})
+      .select("-password -refreshToken");
+    const users = await userModel.find({}).select("-password -refreshToken");
+    const appointments = await appointmentModel
+      .find({})
+      .populate("docId", "-password -refreshToken")
+      .populate("userId", "-password -refreshToken");
 
     const dashData = {
       activeDoctors: doctors.filter((item) => item.available).length,
@@ -249,4 +373,7 @@ export {
   getAllAppointments,
   cancelAppointmentForAdmin,
   adminDashboard,
+  refreshtToken,
+  logout,
+  getAdminInfo,
 };

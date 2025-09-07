@@ -2,13 +2,18 @@ import { useState } from "react";
 import { createContext } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import axiosInstance from "../apis/axiosInstance";
+import { useEffect } from "react";
 
 export const AdminContext = createContext();
 
 const AdminContextProvider = (props) => {
-  const [aToken, setAToken] = useState(
-    localStorage.getItem("aToken") ? localStorage.getItem("aToken") : ""
-  );
+  axios.defaults.withCredentials = true;
+
+  const [loadingAuth, setLoadingAuth] = useState(true);
+
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
   const [doctors, setDoctors] = useState([]);
   const [loadingDash, setLoadingDash] = useState(false);
   const [loadingAppointment, setLoadingDashAppointment] = useState(false);
@@ -21,12 +26,16 @@ const AdminContextProvider = (props) => {
   const getAllDoctors = async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get(`${backendUrl}/api/admin/all-doctors`, {
-        headers: { aToken },
+      const { data } = await axiosInstance.get(`/api/admin/all-doctors`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
       });
 
       if (data.success) {
         setDoctors(data.doctors);
+        setIsAuthenticated(true);
       } else {
         toast.error(data.message);
       }
@@ -40,13 +49,14 @@ const AdminContextProvider = (props) => {
 
   const changeAvailablity = async (docId) => {
     try {
-      const { data } = await axios.post(
-        `${backendUrl}/api/admin/change-availablity`,
+      const { data } = await axiosInstance.post(
+        `/api/admin/change-availablity`,
         { docId },
         {
           headers: {
-            aToken,
+            "Content-Type": "application/json",
           },
+          withCredentials: true,
         }
       );
       if (data.success) {
@@ -63,15 +73,14 @@ const AdminContextProvider = (props) => {
   const getAllAppointments = async () => {
     try {
       setLoadingDashAppointment(true);
-      const { data } = await axios.get(
-        `${backendUrl}/api/admin/all-appointments`,
-        {
-          headers: {
-            aToken,
-          },
-        }
-      );
+      const { data } = await axiosInstance.get(`/api/admin/all-appointments`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      });
       if (data.success) {
+        setIsAuthenticated(true);
         setAppointments(data.appointments);
       } else {
         toast.error(data.message);
@@ -86,17 +95,19 @@ const AdminContextProvider = (props) => {
 
   const cancelAppointment = async (appointmentId) => {
     try {
-      const { data } = await axios.post(
-        `${backendUrl}/api/admin/cancel-appointment`,
+      const { data } = await axiosInstance.post(
+        `/api/admin/cancel-appointment`,
         { appointmentId },
         {
           headers: {
-            aToken,
+            "Content-Type": "application/json",
           },
+          withCredentials: true,
         }
       );
       if (data.success) {
         toast.success(data.message);
+        setIsAuthenticated(true);
         getAllAppointments();
       } else {
         toast.error(data.message);
@@ -110,26 +121,52 @@ const AdminContextProvider = (props) => {
   const getDashboardData = async () => {
     try {
       setLoadingDash(true);
-      const { data } = await axios.get(`${backendUrl}/api/admin/dashboard`, {
+      const { data } = await axiosInstance.get(`/api/admin/dashboard`, {
         headers: {
-          aToken,
+          "Content-Type": "application/json",
         },
+        withCredentials: true,
       });
       if (data.success) {
         setDashData(data.dashData);
+        setIsAuthenticated(true);
       } else {
         toast.error(data.message);
+        setIsAuthenticated(false);
       }
     } catch (error) {
-      toast.error(error.message);
+      console.log(error.message);
     } finally {
       setLoadingDash(false);
     }
   };
 
+  const checkAuth = async () => {
+    try {
+      const { data } = await axiosInstance.get(`/api/admin/me`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      });
+      if (data.success) {
+        setIsAuthenticated(true);
+      } else {
+        setIsAuthenticated(false);
+      }
+    } catch (error) {
+      console.log(error);
+      setIsAuthenticated(false);
+    } finally {
+      setLoadingAuth(false);
+    }
+  };
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
   const value = {
-    aToken,
-    setAToken,
     backendUrl,
     doctors,
     getAllDoctors,
@@ -143,6 +180,10 @@ const AdminContextProvider = (props) => {
     dashData,
     loadingDash,
     loadingAppointment,
+    isAuthenticated,
+    setIsAuthenticated,
+    loadingAuth,
+    checkAuth,
   };
 
   return (

@@ -1,4 +1,3 @@
-// axiosInstance.js
 import axios from "axios";
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -8,29 +7,31 @@ const axiosInstance = axios.create({
   withCredentials: true,
 });
 
-// axiosInstance.js
+let onLogout = null;
+
+export const setLogoutHandler = (fn) => {
+  onLogout = fn;
+};
+
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    // If 401 Unauthorized and not already retried
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
-        // Call refresh token API
+        // Try refreshing token
         await axios.post(
-          `${backendUrl}/api/user/refresh-token`,
+          `${backendUrl}/api/admin/refresh-token`,
           {},
           { withCredentials: true }
         );
 
-        // Retry original request
         return axiosInstance(originalRequest);
       } catch (refreshError) {
-        console.error("Refresh token failed:", refreshError);
-
-        window.location.href = "/login";
+        if (onLogout) onLogout();
+        return Promise.reject(refreshError);
       }
     }
 

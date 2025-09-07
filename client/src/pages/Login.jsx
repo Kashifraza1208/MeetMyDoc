@@ -13,7 +13,6 @@ const Login = () => {
     loadUserProfileData,
     setIsAuthenticated,
     isAuthenticated,
-    loadingUser,
   } = useContext(AppContext);
   const navigate = useNavigate();
   const [state, setState] = useState("Login");
@@ -57,7 +56,6 @@ const Login = () => {
         }
       } else {
         setLoading(true);
-
         const { data } = await axios.post(
           `${backendUrl}/api/user/login`,
           {
@@ -80,10 +78,12 @@ const Login = () => {
           toast.success(data.message);
         } else {
           toast.error(data.message);
+          setIsAuthenticated(false);
         }
       }
     } catch (error) {
       toast.error(error.message);
+      setIsAuthenticated(false);
     } finally {
       setLoading(false);
     }
@@ -95,14 +95,6 @@ const Login = () => {
       navigate(from, { replace: true });
     }
   }, [isAuthenticated, navigate, location]);
-
-  if (loadingUser) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-white">
-        <div className="w-12 h-12 border-4 border-blue-500 border-dashed rounded-full animate-spin"></div>
-      </div>
-    );
-  }
 
   return (
     <form onSubmit={onSubmitHandler} className="min-h-[80vh] flex items-center">

@@ -50,6 +50,7 @@ const AppContextProvider = (props) => {
       }
     } catch (error) {
       setIsAuthenticated(false);
+      setUserData(false);
     } finally {
       setLoadingUser(false);
     }
