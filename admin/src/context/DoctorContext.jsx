@@ -1,6 +1,6 @@
 import { createContext, useState } from "react";
 import { toast } from "react-toastify";
-import axiosInstance from "../apis/axiosInstanceDoctor";
+import axiosInstance, { setLogoutHandler } from "../apis/axiosInstanceDoctor";
 import { useEffect } from "react";
 
 export const DoctorContext = createContext();
@@ -124,6 +124,13 @@ const DoctorContextProvider = (props) => {
 
   useEffect(() => {
     getProfileData();
+  }, []);
+
+  useEffect(() => {
+    setLogoutHandler(() => {
+      setIsAuthenticatedDoctor(false);
+      setLoadingDoctor(false);
+    });
   }, []);
 
   const value = {

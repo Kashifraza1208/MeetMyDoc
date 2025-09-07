@@ -68,7 +68,7 @@ const registerUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, rememberMe } = req.body;
 
     if (!password || !email) {
       {
@@ -97,9 +97,6 @@ const loginUser = async (req, res) => {
     }
 
     const accessToken = generateAccessToken(user._id);
-    const refreshToken = generateRefreshToken(user._id);
-
-    await userModel.findByIdAndUpdate(user._id, { refreshToken: refreshToken });
 
     const optionsForAccessToken = {
       httpOnly: true,
@@ -107,19 +104,31 @@ const loginUser = async (req, res) => {
       sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
       maxAge: 1 * 60 * 60 * 1000,
     };
-    const optionsForRefreshToken = {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
-      maxAge: 5 * 24 * 60 * 60 * 1000,
-    };
-    res
-      .cookie("accessToken", accessToken, optionsForAccessToken)
-      .cookie("refreshToken", refreshToken, optionsForRefreshToken)
-      .json({
+
+    if (rememberMe) {
+      const refreshToken = generateRefreshToken(user._id);
+      await userModel.findByIdAndUpdate(user._id, {
+        refreshToken: refreshToken,
+      });
+      const optionsForRefreshToken = {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+        maxAge: 5 * 24 * 60 * 60 * 1000,
+      };
+      res
+        .cookie("accessToken", accessToken, optionsForAccessToken)
+        .cookie("refreshToken", refreshToken, optionsForRefreshToken)
+        .json({
+          success: true,
+          message: "Login successfully",
+        });
+    } else {
+      res.cookie("accessToken", accessToken, optionsForAccessToken).json({
         success: true,
         message: "Login successfully",
       });
+    }
   } catch (error) {
     console.log(error);
     res.json({

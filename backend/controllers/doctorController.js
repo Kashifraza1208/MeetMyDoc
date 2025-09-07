@@ -51,7 +51,7 @@ const doctorList = async (req, res) => {
 
 const loginDoctor = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, rememberMe } = req.body;
 
     const doctor = await doctorModel.findOne({ email });
     if (!doctor) {
@@ -70,11 +70,6 @@ const loginDoctor = async (req, res) => {
     }
 
     const accessToken = generateAccessToken(doctor._id);
-    const refreshToken = generateRefreshToken(doctor._id);
-
-    await doctorModel.findByIdAndUpdate(doctor._id, {
-      refreshToken: refreshToken,
-    });
 
     const optionsForAccessToken = {
       httpOnly: true,
@@ -82,19 +77,31 @@ const loginDoctor = async (req, res) => {
       sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
       maxAge: 1 * 60 * 60 * 1000,
     };
-    const optionsForRefreshToken = {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
-      maxAge: 5 * 24 * 60 * 60 * 1000,
-    };
-    res
-      .cookie("accessToken", accessToken, optionsForAccessToken)
-      .cookie("refreshToken", refreshToken, optionsForRefreshToken)
-      .json({
+
+    if (rememberMe) {
+      const refreshToken = generateRefreshToken(doctor._id);
+      await doctorModel.findByIdAndUpdate(doctor._id, {
+        refreshToken: refreshToken,
+      });
+      const optionsForRefreshToken = {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+        maxAge: 5 * 24 * 60 * 60 * 1000,
+      };
+      res
+        .cookie("accessToken", accessToken, optionsForAccessToken)
+        .cookie("refreshToken", refreshToken, optionsForRefreshToken)
+        .json({
+          success: true,
+          message: "Login successfully",
+        });
+    } else {
+      res.cookie("accessToken", accessToken, optionsForAccessToken).json({
         success: true,
         message: "Login successfully",
       });
+    }
   } catch (error) {
     console.log(error);
     res.json({

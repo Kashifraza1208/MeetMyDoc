@@ -107,7 +107,7 @@ const addDoctor = async (req, res) => {
 
 const loginAdmin = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, rememberMe } = req.body;
     const payload = {
       email,
       role: "admin",
@@ -119,30 +119,40 @@ const loginAdmin = async (req, res) => {
       const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
         expiresIn: process.env.ACCESS_TOKEN_EXPIRE,
       });
-
-      const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, {
-        expiresIn: process.env.REFRESH_TOKEN_EXPIRE,
-      });
       const optionsForAccessToken = {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
         maxAge: 1 * 60 * 60 * 1000,
       };
-      const optionsForRefreshToken = {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
-        maxAge: 5 * 24 * 60 * 60 * 1000,
-      };
 
-      res
-        .cookie("accessToken", accessToken, optionsForAccessToken)
-        .cookie("refreshToken", refreshToken, optionsForRefreshToken)
-        .json({
+      if (rememberMe) {
+        const refreshToken = jwt.sign(
+          payload,
+          process.env.REFRESH_TOKEN_SECRET,
+          {
+            expiresIn: process.env.REFRESH_TOKEN_EXPIRE,
+          }
+        );
+        const optionsForRefreshToken = {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+          maxAge: 5 * 24 * 60 * 60 * 1000,
+        };
+        res
+          .cookie("accessToken", accessToken, optionsForAccessToken)
+          .cookie("refreshToken", refreshToken, optionsForRefreshToken)
+          .json({
+            success: true,
+            message: "Login successfully",
+          });
+      } else {
+        res.cookie("accessToken", accessToken, optionsForAccessToken).json({
           success: true,
           message: "Login successfully",
         });
+      }
     } else {
       res.json({
         success: false,

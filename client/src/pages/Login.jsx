@@ -21,7 +21,7 @@ const Login = () => {
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
 
   const location = useLocation();
 
@@ -61,6 +61,7 @@ const Login = () => {
           {
             email,
             password,
+            rememberMe,
           },
           {
             headers: {
@@ -150,17 +151,20 @@ const Login = () => {
           )}
         </div>
 
-        <div className="flex items-center justify-between text-xs">
-          <label className="flex items-center gap-2 text-xs font-normal">
-            <input
-              type="checkbox"
-              checked={rememberMe}
-              onChange={(e) => setRememberMe(e.target.checked)}
-              className="form-checkbox"
-            />{" "}
-            Remember me
-          </label>
-        </div>
+        {state === "Login" && (
+          <div className="flex items-center justify-between text-xs">
+            <label className="flex items-center gap-2 text-xs font-normal">
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="form-checkbox"
+              />{" "}
+              Remember me
+            </label>
+          </div>
+        )}
+
         <button
           type="submit"
           disabled={loading}

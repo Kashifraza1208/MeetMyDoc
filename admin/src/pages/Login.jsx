@@ -21,6 +21,7 @@ const Login = () => {
   const { setRole } = useContext(AppContext);
   const adminCtx = useContext(AdminContext);
   const doctorCtx = useContext(DoctorContext);
+  const [rememberMe, setRememberMe] = useState(true);
 
   const isAuthenticated = adminCtx?.isAuthenticated || false;
   const setIsAuthenticated = adminCtx?.setIsAuthenticated || (() => {});
@@ -43,6 +44,7 @@ const Login = () => {
           {
             email,
             password,
+            rememberMe,
           },
           {
             headers: {
@@ -70,6 +72,7 @@ const Login = () => {
           {
             email,
             password,
+            rememberMe,
           },
           {
             headers: {
@@ -162,6 +165,17 @@ const Login = () => {
               className="absolute top-9 right-3 text-gray-400"
             />
           )}
+        </div>
+        <div className="flex items-center justify-between text-xs">
+          <label className="flex items-center gap-2 text-xs font-normal">
+            <input
+              type="checkbox"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+              className="form-checkbox"
+            />{" "}
+            Remember me
+          </label>
         </div>
         <button className="bg-[var(--primary)] text-white w-full py-2 rounded-md text-base">
           Login
