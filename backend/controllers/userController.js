@@ -10,7 +10,7 @@ import appointmentModel from "../models/appointmentModel.js";
 import razorpay from "razorpay";
 import {
   generateAccessToken,
-  generateAcessTokenAndRefreshToken,
+  generateRefreshToken,
 } from "../utils/sendToken.js";
 
 const registerUser = async (req, res) => {
@@ -80,44 +80,46 @@ const loginUser = async (req, res) => {
     }
 
     // check if email  exists
-    const user1 = await userModel.findOne({ email });
-    if (!user1) {
-      return res
-        .status(400)
-        .json({ success: false, message: "User not found" });
-    }
-
-    const isMatch = await bcrypt.compare(password, user1.password);
-
-    if (isMatch) {
-      const { accessToken, refreshToken } =
-        await generateAcessTokenAndRefreshToken(user1._id);
-
-      const optionsForAccessToken = {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
-        maxAge: 1 * 60 * 60 * 1000,
-      };
-      const optionsForRefreshToken = {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
-        maxAge: 5 * 24 * 60 * 60 * 1000,
-      };
-      res
-        .cookie("accessToken", accessToken, optionsForAccessToken)
-        .cookie("refreshToken", refreshToken, optionsForRefreshToken)
-        .json({
-          success: true,
-          message: "Login successfully",
-        });
-    } else {
-      return res.status(401).json({
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      return res.status(404).json({
         success: false,
-        message: "Invalid Credentials",
+        message: "User not found",
       });
     }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials",
+      });
+    }
+
+    const accessToken = generateAccessToken(user._id);
+    const refreshToken = generateRefreshToken(user._id);
+
+    await userModel.findByIdAndUpdate(user._id, { refreshToken: refreshToken });
+
+    const optionsForAccessToken = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+      maxAge: 1 * 60 * 60 * 1000,
+    };
+    const optionsForRefreshToken = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+      maxAge: 5 * 24 * 60 * 60 * 1000,
+    };
+    res
+      .cookie("accessToken", accessToken, optionsForAccessToken)
+      .cookie("refreshToken", refreshToken, optionsForRefreshToken)
+      .json({
+        success: true,
+        message: "Login successfully",
+      });
   } catch (error) {
     console.log(error);
     res.json({
@@ -224,7 +226,7 @@ const getProfile = async (req, res) => {
 
     const userData = await userModel
       .findById(userId)
-      .select("-password -refreshToken");
+      .select({ password: 0, refreshToken: 0 });
     res.json({
       success: true,
       userData,
@@ -290,7 +292,9 @@ const bookAppointment = async (req, res) => {
     const userId = req.user.id;
     const { docId, slotDate, slotTime } = req.body;
 
-    const docData = await doctorModel.findById(docId).select("-password");
+    const docData = await doctorModel
+      .findById(docId)
+      .select({ password: 0, refreshToken: 0 });
     if (!docData.available) {
       return res.json({
         success: false,
@@ -314,7 +318,9 @@ const bookAppointment = async (req, res) => {
       slots_booked[slotDate].push(slotTime);
     }
 
-    const userData = await userModel.findById(userId).select("-password");
+    const userData = await userModel
+      .findById(userId)
+      .select({ password: 0, refreshToken: 0 });
 
     delete docData.slots_booked;
 
@@ -375,6 +381,7 @@ const listAppointment = async (req, res) => {
 const cancelAppointment = async (req, res) => {
   try {
     const userId = req.user.id;
+    console.log(userId, "==========>");
     const { appointmentId } = req.body;
     const appointmentData = await appointmentModel.findById(appointmentId);
 

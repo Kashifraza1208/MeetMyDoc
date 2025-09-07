@@ -1,34 +1,28 @@
-import React, { useContext, useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { assets } from "../../assets/assets";
 import { RiMoneyRupeeCircleFill } from "react-icons/ri";
 import { AppContext } from "../../context/AppContext";
-import {
-  FaStethoscope,
-  FaUserInjured,
-  FaCalendarAlt,
-  FaCheckCircle,
-  FaTimesCircle,
-} from "react-icons/fa";
+import { FaUserInjured, FaCalendarAlt } from "react-icons/fa";
 
 import AppointmentStatus from "../admin/AppointmentStatus";
 import { DoctorContext } from "../../context/DoctorContext";
 
 const DoctorDashboard = () => {
   const {
-    dToken,
     dashData,
     getDashData,
     completeAppointment,
     cancelAppointment,
+    isAuthenticatedDoctor,
   } = useContext(DoctorContext);
 
   const { slotDateFormat } = useContext(AppContext);
 
   useEffect(() => {
-    if (dToken) {
+    if (isAuthenticatedDoctor) {
       getDashData();
     }
-  }, [dToken]);
+  }, [isAuthenticatedDoctor]);
 
   const statsCards = [
     {

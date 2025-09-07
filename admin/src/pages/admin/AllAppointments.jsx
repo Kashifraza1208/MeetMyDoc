@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { assets } from "../../assets/assets";
 import { AdminContext } from "../../context/AdminContext";
@@ -7,8 +7,8 @@ import AppointmentLoading from "../../components/AppointmentLoading";
 
 const AllAppointments = () => {
   const {
-    aToken,
     getAllAppointments,
+    isAuthenticated,
     appointments,
     cancelAppointment,
     loadingAppointment,
@@ -18,10 +18,10 @@ const AllAppointments = () => {
   const { calculateAge, slotDateFormat } = useContext(AppContext);
 
   useEffect(() => {
-    if (aToken) {
+    if (isAuthenticated) {
       getAllAppointments();
     }
-  }, [aToken]);
+  }, [isAuthenticated]);
 
   const filteredData = appointments.filter((item) => {
     if (item && item.userData && item.docData) {

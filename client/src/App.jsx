@@ -17,6 +17,14 @@ import { AppContext } from "./context/AppContext";
 const App = () => {
   const { loadingUser, isAuthenticated } = useContext(AppContext);
 
+  if (loadingUser) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-white">
+        <div className="w-12 h-12 border-4 border-blue-500 border-dashed rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="mx-4 sm:mx-[10%]">
       <Navbar />

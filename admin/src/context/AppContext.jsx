@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { createContext } from "react";
 
 export const AppContext = createContext();
 
 const AppContextProvider = (props) => {
+  const [role, setRole] = useState(localStorage.getItem("role"));
   const calculateAge = (dob) => {
     const today = new Date();
     const birthDate = new Date(dob);
@@ -36,7 +38,7 @@ const AppContextProvider = (props) => {
     );
   };
 
-  const value = { calculateAge, slotDateFormat };
+  const value = { calculateAge, slotDateFormat, role, setRole };
 
   return (
     <AppContext.Provider value={value}>{props.children}</AppContext.Provider>

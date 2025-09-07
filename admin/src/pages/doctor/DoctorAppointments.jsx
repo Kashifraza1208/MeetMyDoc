@@ -6,7 +6,7 @@ import { AppContext } from "../../context/AppContext";
 const DoctorAppointments = () => {
   const {
     appointments,
-    dToken,
+    isAuthenticatedDoctor,
     getAppointments,
     completeAppointment,
     cancelAppointment,
@@ -14,10 +14,10 @@ const DoctorAppointments = () => {
   const { calculateAge, slotDateFormat } = useContext(AppContext);
 
   useEffect(() => {
-    if (dToken) {
+    if (isAuthenticatedDoctor) {
       getAppointments();
     }
-  }, [dToken]);
+  }, [isAuthenticatedDoctor]);
 
   return (
     <div className=" w-full  md:ml-52 md:left-52 md:w-[calc(100%-208px)]">

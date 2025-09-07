@@ -2,13 +2,11 @@ import React from "react";
 import { useState } from "react";
 import { assets } from "../../assets/assets";
 import { toast } from "react-toastify";
-import axios from "axios";
-import { useContext } from "react";
-import { AdminContext } from "../../context/AdminContext";
+
 import Loading from "../../components/Loading";
+import axiosInstance from "../../apis/axiosInstance";
 
 const AddDoctor = () => {
-  const { backendUrl, aToken } = useContext(AdminContext);
   const [loading, setLoading] = useState(false);
   const [docImg, setDocImg] = useState(false);
   const [email, setEmail] = useState("");
@@ -43,13 +41,11 @@ const AddDoctor = () => {
     );
     try {
       setLoading(true);
-      const { data } = await axios.post(
-        backendUrl + "/api/admin/add-doctor",
+      const { data } = await axiosInstance.post(
+        "/api/admin/add-doctor",
         formData,
         {
-          headers: {
-            aToken,
-          },
+          withCredentials: true,
         }
       );
       if (data.success) {

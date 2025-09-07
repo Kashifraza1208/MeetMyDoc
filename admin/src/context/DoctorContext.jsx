@@ -1,6 +1,7 @@
-import axios from "axios";
 import { createContext, useState } from "react";
 import { toast } from "react-toastify";
+import axiosInstance from "../apis/axiosInstanceDoctor";
+import { useEffect } from "react";
 
 export const DoctorContext = createContext();
 
@@ -9,23 +10,20 @@ const DoctorContextProvider = (props) => {
 
   const [appointments, setAppointments] = useState([]);
   const [dashData, setData] = useState(false);
+  const [loadingDoctor, setLoadingDoctor] = useState(true);
+
+  const [isAuthenticatedDoctor, setIsAuthenticatedDoctor] = useState(false);
 
   const [profileData, setProfileData] = useState(false);
 
-  const [dToken, setDToken] = useState(
-    localStorage.getItem("dToken") ? localStorage.getItem("dToken") : ""
-  );
-
   const getAppointments = async () => {
     try {
-      const { data } = await axios.get(
-        `${backendUrl}/api/doctor/appointments`,
-        {
-          headers: {
-            dToken,
-          },
-        }
-      );
+      const { data } = await axiosInstance.get(`/api/doctor/appointments`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      });
       if (data.success) {
         setAppointments(data.appointments.reverse());
       } else {
@@ -38,13 +36,14 @@ const DoctorContextProvider = (props) => {
 
   const completeAppointment = async (appointmentId) => {
     try {
-      const { data } = await axios.post(
-        `${backendUrl}/api/doctor/complete-appointment`,
+      const { data } = await axiosInstance.post(
+        `/api/doctor/complete-appointment`,
         { appointmentId },
         {
           headers: {
-            dToken,
+            "Content-Type": "application/json",
           },
+          withCredentials: true,
         }
       );
       if (data.success) {
@@ -60,13 +59,14 @@ const DoctorContextProvider = (props) => {
 
   const cancelAppointment = async (appointmentId) => {
     try {
-      const { data } = await axios.post(
-        `${backendUrl}/api/doctor/cancel-appointment`,
+      const { data } = await axiosInstance.post(
+        `/api/doctor/cancel-appointment`,
         { appointmentId },
         {
           headers: {
-            dToken,
+            "Content-Type": "application/json",
           },
+          withCredentials: true,
         }
       );
       if (data.success) {
@@ -82,28 +82,35 @@ const DoctorContextProvider = (props) => {
 
   const getProfileData = async () => {
     try {
-      const { data } = await axios.get(`${backendUrl}/api/doctor/profile`, {
+      const { data } = await axiosInstance.get(`/api/doctor/profile`, {
         headers: {
-          dToken,
+          "Content-Type": "application/json",
         },
+        withCredentials: true,
       });
 
       if (data.success) {
+        setIsAuthenticatedDoctor(true);
         setProfileData(data.profileData);
       } else {
+        setIsAuthenticatedDoctor(false);
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error.message);
+      console.log(error);
+      setIsAuthenticatedDoctor(false);
+    } finally {
+      setLoadingDoctor(false);
     }
   };
 
   const getDashData = async () => {
     try {
-      const { data } = await axios.get(`${backendUrl}/api/doctor/dashboard`, {
+      const { data } = await axiosInstance.get(`/api/doctor/dashboard`, {
         headers: {
-          dToken,
+          "Content-Type": "application/json",
         },
+        withCredentials: true,
       });
       if (data.success) {
         setData(data.dashData);
@@ -115,9 +122,11 @@ const DoctorContextProvider = (props) => {
     }
   };
 
+  useEffect(() => {
+    getProfileData();
+  }, []);
+
   const value = {
-    dToken,
-    setDToken,
     backendUrl,
     appointments,
     getAppointments,
@@ -128,6 +137,10 @@ const DoctorContextProvider = (props) => {
     profileData,
     getProfileData,
     setProfileData,
+    setIsAuthenticatedDoctor,
+    isAuthenticatedDoctor,
+    setLoadingDoctor,
+    loadingDoctor,
   };
 
   return (

@@ -7,15 +7,20 @@ import AppointmentStatus from "./AppointmentStatus";
 import DashboardLoading from "../../components/DashboardLoading";
 
 const Dashboard = () => {
-  const { aToken, getDashboardData, dashData, cancelAppointment, loadingDash } =
-    useContext(AdminContext);
+  const {
+    isAuthenticated,
+    getDashboardData,
+    dashData,
+    cancelAppointment,
+    loadingDash,
+  } = useContext(AdminContext);
   const { slotDateFormat } = useContext(AppContext);
 
   useEffect(() => {
-    if (aToken) {
+    if (isAuthenticated) {
       getDashboardData();
     }
-  }, [aToken]);
+  }, [isAuthenticated]);
 
   const statsCards = [
     {

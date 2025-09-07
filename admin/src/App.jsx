@@ -16,35 +16,110 @@ import { DoctorContext } from "./context/DoctorContext.jsx";
 import DoctorAppointments from "./pages/doctor/DoctorAppointments.jsx";
 import DoctorDashboard from "./pages/doctor/DoctorDashboard.jsx";
 import DoctorProfile from "./pages/doctor/DoctorProfile.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
 const App = () => {
-  const { aToken } = useContext(AdminContext);
-  const { dToken } = useContext(DoctorContext);
+  const adminCtx = useContext(AdminContext);
+  const doctorCtx = useContext(DoctorContext);
 
-  return aToken || dToken ? (
-    <div className="bg-[#f8f9fd]">
-      <Navbar />
-      <ToastContainer />
-      <div className="flex items-start">
-        <Sidebar />
-        <Routes>
-          {/* admin route  */}
-          <Route path="/" element={<></>} />
-          <Route path="/admin-dashboard" element={<Dashboard />} />
-          <Route path="/all-appointments" element={<AllAppointments />} />
-          <Route path="/add-doctor" element={<AddDoctor />} />
-          <Route path="/doctor-list" element={<DoctorsList />} />
+  const isAuthenticated = adminCtx?.isAuthenticated || false;
+  const loadingAuth = adminCtx?.loadingAuth || false;
+  const loadingDoctor = doctorCtx?.loadingDoctor || false;
+  const isAuthenticatedDoctor = doctorCtx?.isAuthenticatedDoctor || false;
 
-          {/* Doctor route */}
-          <Route path="/doctor-appointments" element={<DoctorAppointments />} />
-          <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
-          <Route path="/doctor-profile" element={<DoctorProfile />} />
-        </Routes>
+  if (loadingAuth) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-white">
+        <div className="w-12 h-12 border-4 border-blue-500 border-dashed rounded-full animate-spin"></div>
       </div>
-    </div>
-  ) : (
+    );
+  }
+
+  if (loadingDoctor) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-white">
+        <div className="w-12 h-12 border-4 border-blue-500 border-dashed rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  return (
     <>
-      <Login />
+      {isAuthenticated || isAuthenticatedDoctor ? (
+        <div className="bg-[#f8f9fd]">
+          <Navbar />
+
+          <div className="flex items-start">
+            <Sidebar />
+            <Routes>
+              <Route path="/" element={<></>} />
+              <Route
+                path="/admin-dashboard"
+                element={
+                  <ProtectedRoute isAuthenticated={isAuthenticated}>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/all-appointments"
+                element={
+                  <ProtectedRoute isAuthenticated={isAuthenticated}>
+                    <AllAppointments />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/add-doctor"
+                element={
+                  <ProtectedRoute isAuthenticated={isAuthenticated}>
+                    <AddDoctor />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/doctor-list"
+                element={
+                  <ProtectedRoute isAuthenticated={isAuthenticated}>
+                    <DoctorsList />
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* Doctor route */}
+              <Route
+                path="/doctor-appointments"
+                element={
+                  <ProtectedRoute isAuthenticated={isAuthenticatedDoctor}>
+                    {" "}
+                    <DoctorAppointments />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/doctor-profile"
+                element={
+                  <ProtectedRoute isAuthenticated={isAuthenticatedDoctor}>
+                    <DoctorProfile />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/doctor-dashboard"
+                element={
+                  <ProtectedRoute isAuthenticated={isAuthenticatedDoctor}>
+                    <DoctorDashboard />
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+          </div>
+        </div>
+      ) : (
+        <Login />
+      )}
+
       <ToastContainer />
     </>
   );

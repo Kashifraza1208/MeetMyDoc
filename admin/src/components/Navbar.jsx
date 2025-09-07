@@ -1,25 +1,75 @@
 import { useNavigate } from "react-router-dom";
 
-import { CiStethoscope } from "react-icons/ci";
-
 import { useContext } from "react";
 import { AdminContext } from "../context/AdminContext";
-import { DoctorContext } from "../context/DoctorContext";
+
 import { assets } from "../assets/assets";
+import { toast } from "react-toastify";
+import axiosInstance from "../apis/axiosInstance";
+import { DoctorContext } from "../context/DoctorContext";
 
 const Navbar = () => {
-  const { aToken, setAToken } = useContext(AdminContext);
-  const { dToken, setDToken } = useContext(DoctorContext);
+  const doctorCtx = useContext(DoctorContext);
+
+  const adminCtx = useContext(AdminContext);
+  const isAuthenticated = adminCtx?.isAuthenticated || false;
+  const setIsAuthenticated = adminCtx?.setIsAuthenticated || (() => {});
+
+  const isAuthenticatedDoctor = doctorCtx?.isAuthenticatedDoctor || false;
+  const setIsAuthenticatedDoctor =
+    doctorCtx?.setIsAuthenticatedDoctor || (() => {});
 
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    navigate("/");
-    aToken && setAToken("");
-    aToken && localStorage.removeItem("aToken");
+  const role = localStorage.getItem("role");
 
-    dToken && setDToken("");
-    dToken && localStorage.removeItem("dToken");
+  const handleLogout = async (e) => {
+    e.preventDefault();
+    try {
+      if (role === "Doctor") {
+        const { data } = await axiosInstance.post(
+          `/api/doctor/logout`,
+          {},
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+            withCredentials: true,
+          }
+        );
+        if (data.success) {
+          toast.success(data.message);
+          localStorage.removeItem("role");
+          setIsAuthenticatedDoctor(false);
+          navigate("/login");
+          window.scrollTo(0, 0);
+        } else {
+          toast.error(data.message);
+        }
+      } else if (role === "Admin") {
+        const { data } = await axiosInstance.post(
+          `/api/admin/logout`,
+          {},
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+            withCredentials: true,
+          }
+        );
+        if (data.success) {
+          toast.success(data.message);
+          localStorage.removeItem("role");
+          setIsAuthenticated(false);
+          navigate("/login");
+          window.scrollTo(0, 0);
+        } else {
+          toast.error(data.message);
+        }
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   return (
@@ -38,7 +88,7 @@ const Navbar = () => {
           </div>
         </div>
         <p className="border px-2.5 py-0.5 rounded-full border-gray-200 text-gray-600">
-          {aToken ? "Admin" : "Doctor"}
+          {isAuthenticated ? "Admin" : isAuthenticatedDoctor ? "Doctor" : ""}
         </p>
       </div>
       <button
