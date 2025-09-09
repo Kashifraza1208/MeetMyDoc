@@ -22,21 +22,39 @@ const AdminContextProvider = (props) => {
   const [appointments, setAppointments] = useState([]);
   const [users, setUsers] = useState([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
+  // Doctors
+  const [doctorPage, setDoctorPage] = useState(1);
+  const [doctorTotalPage, setDoctorTotalPage] = useState(0);
+  const [doctorSearch, setDoctorSearch] = useState("");
+
+  // Appointments
+  const [appointmentPage, setAppointmentPage] = useState(1);
+  const [appointmentTotalPage, setAppointmentTotalPage] = useState(0);
+  const [appointmentSearch, setAppointmentSearch] = useState("");
+
+  // Users
+  const [userPage, setUserPage] = useState(1);
+  const [userTotalPage, setUserTotalPage] = useState(0);
+  const [userSearch, setUserSearch] = useState("");
 
   const [dashData, setDashData] = useState(false);
 
   const getAllDoctors = async () => {
     try {
       setLoading(true);
-      const { data } = await axiosInstance.get(`/api/admin/all-doctors`, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        withCredentials: true,
-      });
+      const { data } = await axiosInstance.get(
+        `/api/admin/all-doctors?page=${doctorPage}&limit=${8}&search=${doctorSearch}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
 
       if (data.success) {
         setDoctors(data.doctors);
+        setDoctorTotalPage(data.count);
         setIsAuthenticated(true);
       } else {
         toast.error(data.message);
@@ -75,15 +93,19 @@ const AdminContextProvider = (props) => {
   const getAllAppointments = async () => {
     try {
       setLoadingDashAppointment(true);
-      const { data } = await axiosInstance.get(`/api/admin/all-appointments`, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        withCredentials: true,
-      });
+      const { data } = await axiosInstance.get(
+        `/api/admin/all-appointments?page=${appointmentPage}&limit=${6}&search=${appointmentSearch}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
       if (data.success) {
         setIsAuthenticated(true);
         setAppointments(data.appointments);
+        setAppointmentTotalPage(data.count);
       } else {
         toast.error(data.message);
       }
@@ -98,14 +120,18 @@ const AdminContextProvider = (props) => {
   const getAllPatients = async () => {
     try {
       setLoadingUsers(true);
-      const { data } = await axiosInstance.get(`/api/admin/all-users`, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        withCredentials: true,
-      });
+      const { data } = await axiosInstance.get(
+        `/api/admin/all-users?page=${userPage}$limit=${8}&search=${userSearch}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
       if (data.success) {
         setUsers(data.users);
+        setUserTotalPage(data.count);
       } else {
         toast.error(data.message);
       }
@@ -218,6 +244,21 @@ const AdminContextProvider = (props) => {
     getAllPatients,
     users,
     loadingUsers,
+    doctorPage,
+    setDoctorPage,
+    doctorTotalPage,
+    doctorSearch,
+    setDoctorSearch,
+    appointmentPage,
+    setAppointmentPage,
+    appointmentTotalPage,
+    appointmentSearch,
+    setAppointmentSearch,
+    userPage,
+    setUserPage,
+    userTotalPage,
+    userSearch,
+    setUserSearch,
   };
 
   return (

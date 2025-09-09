@@ -79,7 +79,7 @@ const Navbar = () => {
   return (
     <>
       {" "}
-      <div className="flex sticky top-0 left-0 z-50 right-0 justify-between items-center h-14 px-4 sm:px-10 border-b bg-white">
+      <div className="flex sticky top-0 left-0 z-50 right-0 justify-between items-center h-14 px-4 sm:px-10 border-gray-200 border-b bg-white">
         <div className="flex items-center gap-2">
           <button
             className="md:hidden p-2"
@@ -99,7 +99,7 @@ const Navbar = () => {
               <span className="text-xs">Dashboard</span>
             </div>
           </div>
-          <p className="border md:px-2.5 px-2 py-0.5 md:text-lg text-xs rounded-full border-gray-200 text-gray-600">
+          <p className="border md:px-2.5 px-2 py-0.5 md:text-sm text-xs rounded-full border-gray-200 text-gray-600">
             {isAuthenticated ? "Admin" : isAuthenticatedDoctor ? "Doctor" : ""}
           </p>
         </div>

@@ -11,26 +11,38 @@ const DoctorContextProvider = (props) => {
   const [appointments, setAppointments] = useState([]);
   const [dashData, setData] = useState(false);
   const [loadingDoctor, setLoadingDoctor] = useState(true);
+  const [loadingAppointment, setLoadingDashAppointment] = useState(false);
 
   const [isAuthenticatedDoctor, setIsAuthenticatedDoctor] = useState(false);
 
   const [profileData, setProfileData] = useState(false);
 
+  const [appointmentPage, setAppointmentPage] = useState(1);
+  const [appointmentTotalPage, setAppointmentTotalPage] = useState(0);
+  const [appointmentSearch, setAppointmentSearch] = useState("");
+
   const getAppointments = async () => {
     try {
-      const { data } = await axiosInstance.get(`/api/doctor/appointments`, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        withCredentials: true,
-      });
+      setLoadingDashAppointment(true);
+      const { data } = await axiosInstance.get(
+        `/api/doctor/appointments?page=${appointmentPage}&limit=${8}&search=${appointmentSearch}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
       if (data.success) {
         setAppointments(data.appointments.reverse());
+        setAppointmentTotalPage(data.count);
       } else {
         toast.error(data.message);
       }
     } catch (error) {
       toast.error(error.message);
+    } finally {
+      setLoadingDashAppointment(false);
     }
   };
 
@@ -148,6 +160,12 @@ const DoctorContextProvider = (props) => {
     isAuthenticatedDoctor,
     setLoadingDoctor,
     loadingDoctor,
+    loadingAppointment,
+    setAppointmentPage,
+    appointmentPage,
+    appointmentTotalPage,
+    appointmentSearch,
+    setAppointmentSearch,
   };
 
   return (

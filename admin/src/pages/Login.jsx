@@ -9,6 +9,7 @@ import { AdminContext } from "../context/AdminContext";
 import { DoctorContext } from "../context/DoctorContext";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import Loading from "../components/Loading";
 import { AppContext } from "../context/AppContext";
 
 const Login = () => {
@@ -21,7 +22,8 @@ const Login = () => {
   const { setRole } = useContext(AppContext);
   const adminCtx = useContext(AdminContext);
   const doctorCtx = useContext(DoctorContext);
-  const [rememberMe, setRememberMe] = useState(true);
+  const [rememberMe, setRememberMe] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const isAuthenticated = adminCtx?.isAuthenticated || false;
   const setIsAuthenticated = adminCtx?.setIsAuthenticated || (() => {});
@@ -34,11 +36,20 @@ const Login = () => {
   const setIsAuthenticatedDoctor =
     doctorCtx?.setIsAuthenticatedDoctor || (() => {});
 
+  useEffect(() => {
+    const savedEmail = localStorage.getItem("email");
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setRememberMe(true);
+    }
+  }, []);
+
   const onSubmitHandler = async (e) => {
     e.preventDefault();
 
     try {
       if (state === "Admin") {
+        setLoading(true);
         const { data } = await axios.post(
           backendUrl + "/api/admin/login",
           {
@@ -55,6 +66,7 @@ const Login = () => {
         );
 
         if (data.success) {
+          localStorage.setItem("email", email);
           await checkAuth();
           localStorage.setItem("role", "Admin");
           setRole("Admin");
@@ -67,6 +79,8 @@ const Login = () => {
           toast.error(data.message);
         }
       } else {
+        setLoading(true);
+
         const { data } = await axios.post(
           `${backendUrl}/api/doctor/login`,
           {
@@ -83,6 +97,8 @@ const Login = () => {
         );
         if (data.success) {
           localStorage.setItem("role", "Doctor");
+          localStorage.setItem("email", email);
+
           setRole("Doctor");
           navigate("/doctor-dashboard");
           setIsAuthenticatedDoctor(true);
@@ -95,6 +111,8 @@ const Login = () => {
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -177,8 +195,8 @@ const Login = () => {
             Remember me
           </label>
         </div>
-        <button className="bg-[var(--primary)] text-white w-full py-2 rounded-md text-base">
-          Login
+        <button className="bg-[var(--primary)] cursor-pointer flex items-center justify-center text-white w-full py-2 rounded-md text-base">
+          Login {loading && <Loading />}
         </button>
         {state === "Admin" ? (
           <p>

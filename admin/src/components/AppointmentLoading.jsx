@@ -1,12 +1,12 @@
 const AppointmentLoading = () => {
   return (
-    <div className="w-full md:ml-52 md:left-52 md:w-[calc(100%-208px)]">
-      <div className="w-full md:px-14 p-5 animate-pulse">
+    <div className="">
+      <div className=" animate-pulse">
         {/* Header Skeleton */}
-        <div className="md:flex-row flex-col flex items-center justify-between mb-3 gap-4">
+        {/* <div className="md:flex-row flex-col flex items-center justify-between mb-3 gap-4">
           <div className="h-6 w-40 bg-gray-200 rounded"></div>
           <div className="h-10 w-72 bg-gray-200 rounded"></div>
-        </div>
+        </div> */}
 
         {/* Table Skeleton */}
         <div className="bg-white rounded border-gray-200 border text-sm min-h-[60vh]">
