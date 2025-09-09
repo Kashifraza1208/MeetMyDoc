@@ -263,13 +263,33 @@ const getAdminInfo = async (req, res) => {
 
 const allDoctors = async (req, res) => {
   try {
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 8;
+    const search = req.query.search || "";
+
+    const query = search
+      ? {
+          name: { $regex: search, $options: "i" },
+        }
+      : {};
+
+    const skip = (page - 1) * limit;
+
     const doctors = await doctorModel
-      .find({})
+      .find(query)
+      .skip(skip)
+      .limit(limit)
       .select({ password: 0, refreshToken: 0 });
+
+    const docLength = await doctorModel.countDocuments();
+
+    const count = Math.ceil(docLength / limit);
+
     res.json({
       success: true,
       message: "Data Fetched",
       doctors,
+      count,
     });
   } catch (error) {
     console.log(error);
@@ -284,13 +304,40 @@ const allDoctors = async (req, res) => {
 
 const allPatients = async (req, res) => {
   try {
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 4;
+
+    const search = req.query.search || "";
+
+    const skip = (page - 1) * limit;
+
+    const query = search
+      ? {
+          $or: [
+            {
+              name: { $regex: search, $options: "i" },
+            },
+            {
+              email: { $regex: search, $options: "i" },
+            },
+          ],
+        }
+      : {};
+
     const users = await userModel
-      .find({})
+      .find(query)
+      .skip(skip)
+      .limit(limit)
       .select({ password: 0, refreshToken: 0 });
+
+    const docLength = await userModel.countDocuments();
+    const count = Math.ceil(docLength / limit);
+
     res.json({
       success: true,
       message: "Data Fetched",
       users,
+      count,
     });
   } catch (error) {
     console.log(error);
@@ -305,12 +352,35 @@ const allPatients = async (req, res) => {
 
 const getAllAppointments = async (req, res) => {
   try {
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 4;
+
+    const search = req.query.search || "";
+
+    const skip = (page - 1) * limit;
+
+    const query = search
+      ? {
+          $or: [
+            {
+              "docData.name": { $regex: search, $options: "i" },
+            },
+            {
+              "userData.name": { $regex: search, $options: "i" },
+            },
+          ],
+        }
+      : {};
     // get all appointments from database
     const appointments = await appointmentModel
-      .find({})
-      .sort({ slotDate: "asc", slotTime: "asc" });
+      .find(query)
+      .skip(skip)
+      .limit(limit);
     if (appointments) {
-      res.json({ success: true, appointments });
+      const docLength = await appointmentModel.countDocuments();
+
+      const count = Math.ceil(docLength / limit);
+      res.json({ success: true, appointments, count });
     } else {
       res.json({ success: false, message: "No appointments available" });
     }

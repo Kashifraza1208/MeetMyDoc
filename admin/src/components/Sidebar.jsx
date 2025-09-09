@@ -6,7 +6,7 @@ import { DoctorContext } from "../context/DoctorContext";
 
 const Sidebar = ({ closeSidebar, isMobile = false }) => {
   const doctorCtx = useContext(DoctorContext);
-  console.log("object");
+
   const adminCtx = useContext(AdminContext);
 
   const isAuthenticated = adminCtx?.isAuthenticated || false;

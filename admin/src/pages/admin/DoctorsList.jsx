@@ -3,7 +3,8 @@ import { FaSearch } from "react-icons/fa";
 import { useContext } from "react";
 import { AdminContext } from "../../context/AdminContext";
 import { useEffect } from "react";
-import { useState } from "react";
+import PaginationPage from "../../components/PaginationPage";
+import useDebounce from "../../hooks/useDebounce";
 
 const DoctorsList = () => {
   const {
@@ -12,24 +13,20 @@ const DoctorsList = () => {
     getAllDoctors,
     loading,
     changeAvailablity,
+    doctorPage,
+    setDoctorPage,
+    doctorTotalPage,
+    doctorSearch,
+    setDoctorSearch,
   } = useContext(AdminContext);
-  const [searchQuery, setSearchQuery] = useState("");
+
+  const debouncedSearch = useDebounce(doctorSearch, 500);
 
   useEffect(() => {
     if (isAuthenticated) {
       getAllDoctors();
     }
-  }, [isAuthenticated]);
-
-  const filteredData = doctors.filter((item) => {
-    if (item) {
-      const matchFilterDoctorName = item.name
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase());
-
-      return matchFilterDoctorName;
-    }
-  });
+  }, [isAuthenticated, doctorPage, debouncedSearch]);
 
   return (
     <div className=" w-full max-h-[90vh] overflow-y-scroll  md:ml-52 md:left-52 md:w-[calc(100%-208px)]">
@@ -40,8 +37,8 @@ const DoctorsList = () => {
             <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <input
               type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={doctorSearch}
+              onChange={(e) => setDoctorSearch(e.target.value)}
               placeholder="Search by Doctor Name"
               className="p-2 w-full focus:ring-2 focus:outline-none bg-white focus:ring-gray-400 font-normal text-black pl-10  rounded border border-gray-200"
             />
@@ -63,8 +60,8 @@ const DoctorsList = () => {
             ))
         ) : (
           <div className="grid grid-cols-auto  gap-4 gap-y-6">
-            {filteredData.length > 0 &&
-              filteredData.map((doctor) => (
+            {doctors.length > 0 &&
+              doctors.map((doctor) => (
                 <div
                   key={doctor._id}
                   className="border border-indigo-200 rounded-xl max-w-56 overflow-hidden cursor-pointer group"
@@ -95,6 +92,16 @@ const DoctorsList = () => {
               ))}
           </div>
         )}
+
+        <div className="flex border border-gray-100 items-center justify-between w-full bg-gray-50 p-2 mt-10">
+          <div>
+            <span className="text-sm font-semibold text-black">
+              Page {doctorPage} of {doctorTotalPage}
+            </span>
+          </div>
+          <PaginationPage setPage={setDoctorPage} totalPage={doctorTotalPage} />
+          <div></div>
+        </div>
       </div>
     </div>
   );

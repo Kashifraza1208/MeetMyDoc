@@ -205,10 +205,31 @@ const logout = async (req, res) => {
 const appointmentsDoctor = async (req, res) => {
   try {
     const docId = req.doctor.id;
-    const appointments = await appointmentModel.find({ docId });
+
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 4;
+    const search = req.query.search || "";
+
+    const skip = (page - 1) * limit;
+
+    const query = {
+      docId,
+      ...(search && {
+        "userData.name": { $regex: search, $options: "i" },
+      }),
+    };
+
+    const totalCount = await appointmentModel.countDocuments(query);
+
+    const appointments = await appointmentModel
+      .find(query)
+      .skip(skip)
+      .limit(limit);
+
     res.json({
       success: true,
       appointments,
+      count: Math.ceil(totalCount / limit),
     });
   } catch (error) {
     console.log(error);
